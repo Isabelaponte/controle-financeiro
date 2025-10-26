@@ -1,4 +1,4 @@
-package controle.financeiro.backend.dto.request;
+package controle.financeiro.backend.dto.request.usuario;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

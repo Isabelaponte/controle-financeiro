@@ -1,4 +1,4 @@
-package controle.financeiro.backend.dto.response.Usuario;
+package controle.financeiro.backend.dto.response.usuario;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

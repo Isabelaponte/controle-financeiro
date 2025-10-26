@@ -1,8 +1,8 @@
 package controle.financeiro.backend.mapper;
 
-import controle.financeiro.backend.dto.request.AtualizaUsuarioDTO;
-import controle.financeiro.backend.dto.request.CriaUsuarioDTO;
-import controle.financeiro.backend.dto.response.Usuario.UsuarioResponseDTO;
+import controle.financeiro.backend.dto.request.usuario.AtualizaUsuarioDTO;
+import controle.financeiro.backend.dto.request.usuario.CriaUsuarioDTO;
+import controle.financeiro.backend.dto.response.usuario.UsuarioResponseDTO;
 import controle.financeiro.backend.model.Usuario;
 import org.springframework.stereotype.Component;
 
