@@ -18,6 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Fatura {
     @Id
+    @GeneratedValue(generator = "uuid")
     @UuidGenerator
     private String id;
 

@@ -17,6 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 public abstract class Despesa {
     @Id
+    @GeneratedValue(generator = "uuid")
     @UuidGenerator
     private String id;
 

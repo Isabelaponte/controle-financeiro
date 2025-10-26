@@ -15,6 +15,7 @@ import org.hibernate.annotations.UuidGenerator;
 @AllArgsConstructor
 public class MetaFinanceira {
     @Id
+    @GeneratedValue(generator = "uuid")
     @UuidGenerator
     private String id;
 

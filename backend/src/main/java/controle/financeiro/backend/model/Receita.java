@@ -18,7 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Receita {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid")
     @UuidGenerator
     private String id;
 

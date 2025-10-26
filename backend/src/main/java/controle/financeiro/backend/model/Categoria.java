@@ -16,6 +16,7 @@ import org.hibernate.annotations.UuidGenerator;
 public class Categoria {
 
     @Id
+    @GeneratedValue(generator = "uuid")
     @UuidGenerator
     private String id;
 

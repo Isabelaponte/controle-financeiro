@@ -17,6 +17,7 @@ import java.util.Date;
 public class CartaoCredito {
 
     @Id
+    @GeneratedValue(generator = "uuid")
     @UuidGenerator
     private String id;
 
