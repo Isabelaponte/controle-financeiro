@@ -1,13 +1,11 @@
 package controle.financeiro.backend.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "usuario")
@@ -17,6 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Usuario {
     @Id
+    @GeneratedValue(generator = "uuid")
+    @UuidGenerator
     private String id;
 
     @Column(unique = true, nullable = false)
