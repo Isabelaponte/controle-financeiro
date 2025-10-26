@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "despesa_geral")
 @Getter
 @Setter
 @NoArgsConstructor

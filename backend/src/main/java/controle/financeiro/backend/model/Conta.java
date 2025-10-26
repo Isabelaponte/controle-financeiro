@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table
+@Table(name = "conta")
 @Getter
 @Setter
 @NoArgsConstructor

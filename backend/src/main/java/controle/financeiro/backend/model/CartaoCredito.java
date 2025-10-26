@@ -9,7 +9,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "cartao_credito")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,13 +26,13 @@ public class CartaoCredito {
     @Column
     private String icone;
 
-    @Column(nullable = false)
+    @Column(name = "limite_total", nullable = false)
     private Double limiteTotal;
 
-    @Column(nullable = false)
+    @Column(name = "data_fechamento", nullable = false)
     private Date dataFechamento;
 
-    @Column(nullable = false)
+    @Column(name = "data_vencimento", nullable = false)
     private Date dataVencimento;
 
     @ManyToOne

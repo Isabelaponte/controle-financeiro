@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table
+@Table(name = "meta_financeira")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,10 +18,10 @@ public class MetaFinanceira {
     @UuidGenerator
     private String id;
 
-    @Column(nullable = false)
+    @Column(name = "valor_desejado", nullable = false)
     private Double valorDesejado;
 
-    @Column
+    @Column(name = "valor_atual")
     private Double valorAtual;
 
     @Column

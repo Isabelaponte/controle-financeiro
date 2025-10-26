@@ -11,7 +11,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "receita")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +22,7 @@ public class Receita {
     @UuidGenerator
     private String id;
 
-    @Column
+    @Column(name = "data_recebimento")
     private Date dataRecebimento;
 
     @Column

@@ -10,11 +10,12 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.Date;
 
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Despesa {
+public abstract class Despesa {
     @Id
     @UuidGenerator
     private String id;

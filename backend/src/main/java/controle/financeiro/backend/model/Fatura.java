@@ -11,7 +11,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "fatura")
 @Getter
 @Setter
 @NoArgsConstructor
