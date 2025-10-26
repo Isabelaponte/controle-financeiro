@@ -5,8 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -25,10 +29,10 @@ public abstract class Despesa {
     private Boolean pago;
 
     @Column
-    private Date lembrete;
+    private LocalDate lembrete;
 
     @Column(nullable = false)
-    private Date dataDespesa;
+    private LocalDate dataDespesa;
 
     @Column
     private Double valor;
@@ -43,4 +47,12 @@ public abstract class Despesa {
     @ManyToOne
     @JoinColumn(name = "FK_CATEGORIA_ID")
     private Categoria categoria;
+
+    @CreationTimestamp
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
+
+    @UpdateTimestamp
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
 }

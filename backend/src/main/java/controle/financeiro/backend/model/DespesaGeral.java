@@ -26,6 +26,7 @@ public class DespesaGeral extends Despesa{
     @JoinColumn(name = "FK_CONTA_ID")
     private Conta conta;
 
-    @Column
-    private StatusPagamento statusPagamento;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusPagamento statusPagamento = StatusPagamento.PENDENTE;
 }

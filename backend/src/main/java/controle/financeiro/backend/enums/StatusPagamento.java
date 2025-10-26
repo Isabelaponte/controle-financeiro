@@ -6,7 +6,8 @@ public enum StatusPagamento {
     ATRASADO("Atrasado"),
     FECHADO("Fechado"),
     ABERTO("Aberto"),
-    PAGO("Pago");
+    PAGO("Pago"),
+    PENDENTE("Pendente");
 
     private String label;
 
