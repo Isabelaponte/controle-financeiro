@@ -2,7 +2,7 @@ package controle.financeiro.backend.controller;
 
 import controle.financeiro.backend.dto.request.categoria.AtualizaCategoriaDTO;
 import controle.financeiro.backend.dto.request.categoria.CriaCategoriaDTO;
-import controle.financeiro.backend.dto.response.categoria.CategoriaResponseDTO;
+import controle.financeiro.backend.dto.response.CategoriaResponseDTO;
 import controle.financeiro.backend.service.CategoriaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

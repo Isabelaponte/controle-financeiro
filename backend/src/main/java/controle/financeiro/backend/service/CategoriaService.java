@@ -2,7 +2,7 @@ package controle.financeiro.backend.service;
 
 import controle.financeiro.backend.dto.request.categoria.AtualizaCategoriaDTO;
 import controle.financeiro.backend.dto.request.categoria.CriaCategoriaDTO;
-import controle.financeiro.backend.dto.response.categoria.CategoriaResponseDTO;
+import controle.financeiro.backend.dto.response.CategoriaResponseDTO;
 import controle.financeiro.backend.exception.RecursoNaoEcontradoException;
 import controle.financeiro.backend.exception.categoria.CategoriaNomeJaExisteException;
 import controle.financeiro.backend.mapper.CategoriaMapper;

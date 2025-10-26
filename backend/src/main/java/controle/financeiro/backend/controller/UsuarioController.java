@@ -3,7 +3,7 @@ package controle.financeiro.backend.controller;
 import controle.financeiro.backend.dto.request.usuario.AtualizaUsuarioDTO;
 import controle.financeiro.backend.dto.request.usuario.CriaUsuarioDTO;
 import controle.financeiro.backend.dto.request.usuario.AlterarSenhaUsuarioDTO;
-import controle.financeiro.backend.dto.response.usuario.UsuarioResponseDTO;
+import controle.financeiro.backend.dto.response.UsuarioResponseDTO;
 import controle.financeiro.backend.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

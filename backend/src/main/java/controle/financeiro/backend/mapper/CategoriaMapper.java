@@ -2,7 +2,7 @@ package controle.financeiro.backend.mapper;
 
 import controle.financeiro.backend.dto.request.categoria.AtualizaCategoriaDTO;
 import controle.financeiro.backend.dto.request.categoria.CriaCategoriaDTO;
-import controle.financeiro.backend.dto.response.categoria.CategoriaResponseDTO;
+import controle.financeiro.backend.dto.response.CategoriaResponseDTO;
 import controle.financeiro.backend.model.Categoria;
 import controle.financeiro.backend.model.Usuario;
 import org.springframework.stereotype.Component;

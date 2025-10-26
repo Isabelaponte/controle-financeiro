@@ -1,4 +1,4 @@
-package controle.financeiro.backend.dto.response.categoria;
+package controle.financeiro.backend.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
