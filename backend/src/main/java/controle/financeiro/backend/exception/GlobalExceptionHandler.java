@@ -1,5 +1,6 @@
 package controle.financeiro.backend.exception;
 
+import controle.financeiro.backend.exception.categoria.CategoriaNomeJaExisteException;
 import controle.financeiro.backend.exception.usuario.EmailJaExisteException;
 import controle.financeiro.backend.exception.usuario.SenhaInvalidaException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -85,5 +86,17 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleCategoriaNomeJaExiste(CategoriaNomeJaExisteException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Erro ao criar categoria",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }
