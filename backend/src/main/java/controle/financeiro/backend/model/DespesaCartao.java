@@ -22,7 +22,7 @@ public class DespesaCartao extends Despesa{
     private Integer quantidadeParcelas;
 
     @Column
-    private Double juros;
+    private Double juros = 0.0;
 
     @ManyToOne
     @JoinColumn(name = "FK_CARTAO_ID")
