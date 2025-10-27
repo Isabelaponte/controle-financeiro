@@ -45,7 +45,7 @@ public class DespesaGeralMapper {
 
         if (despesa.getConta() != null) {
             dto.setContaId(despesa.getConta().getId());
-            dto.setContaNome(despesa.getConta().getTitulo());
+            dto.setContaNome(despesa.getConta().getNome());
         }
 
         return dto;

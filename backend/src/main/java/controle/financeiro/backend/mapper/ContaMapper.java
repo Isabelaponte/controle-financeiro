@@ -21,7 +21,7 @@ public class ContaMapper {
 
         ContaResponseDTO dto = new ContaResponseDTO();
         dto.setId(conta.getId());
-        dto.setNome(conta.getTitulo());
+        dto.setNome(conta.getNome());
         dto.setIcone(conta.getIcone());
         dto.setTipo(conta.getTipo());
         dto.setSaldo(conta.getSaldo());
@@ -52,7 +52,7 @@ public class ContaMapper {
         }
 
         Conta conta = new Conta();
-        conta.setTitulo(dto.getNome());
+        conta.setNome(dto.getNome());
         conta.setIcone(dto.getIcone());
         conta.setTipo(dto.getTipo());
         conta.setSaldo(dto.getSaldo());
@@ -69,7 +69,7 @@ public class ContaMapper {
         }
 
         if (dto.getNome() != null) {
-            conta.setTitulo(dto.getNome());
+            conta.setNome(dto.getNome());
         }
 
         if (dto.getIcone() != null) {

@@ -37,15 +37,9 @@ public class FaturaController {
         return ResponseEntity.ok(faturas);
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<FaturaResponseDTO>> listarPorUsuario(@PathVariable String usuarioId) {
-        List<FaturaResponseDTO> faturas = faturaService.listarPorUsuario(usuarioId);
-        return ResponseEntity.ok(faturas);
-    }
-
     @GetMapping("/vencidas")
-    public ResponseEntity<List<FaturaResponseDTO>> listarVencidas() {
-        List<FaturaResponseDTO> faturas = faturaService.listarVencidas();
+    public ResponseEntity<List<FaturaResponseDTO>> listarVencidas(@PathVariable String usuarioId) {
+        List<FaturaResponseDTO> faturas = faturaService.listarFaturasVencidas(usuarioId);
         return ResponseEntity.ok(faturas);
     }
 

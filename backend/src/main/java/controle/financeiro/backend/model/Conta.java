@@ -20,7 +20,7 @@ public class Conta {
     private String id;
 
     @Column(nullable = false)
-    private String titulo;
+    private String nome;
 
     @Column
     private String icone;

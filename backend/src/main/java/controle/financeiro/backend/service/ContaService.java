@@ -87,7 +87,7 @@ public class ContaService {
         Conta conta = contaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Conta não encontrada"));
 
-        if (dto.getNome() != null && !conta.getTitulo().equals(dto.getNome())) {
+        if (dto.getNome() != null && !conta.getNome().equals(dto.getNome())) {
             if (contaRepository.existsByNomeAndUsuarioId(dto.getNome(), conta.getUsuario().getId())) {
                 throw new ContaNomeJaExisteException("Já existe uma conta com este nome");
             }

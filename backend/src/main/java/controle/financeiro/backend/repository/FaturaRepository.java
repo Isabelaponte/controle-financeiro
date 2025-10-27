@@ -4,6 +4,7 @@ import controle.financeiro.backend.enums.StatusPagamento;
 import controle.financeiro.backend.model.Fatura;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -19,9 +20,11 @@ public interface FaturaRepository extends JpaRepository<Fatura, String> {
 
     List<Fatura> findByCartaoCreditoIdAndDataVencimentoBetween(String cartaoId, LocalDate inicio, LocalDate fim);
 
-    @Query("SELECT f FROM fatura f WHERE f.dataVencimento < :hoje AND f.statusPagamento <> 'PAGO'")
-    List<Fatura> findVencidas(LocalDate hoje);
-
-    @Query("SELECT f FROM fatura f WHERE f.cartaoCredito.usuario.id = :usuarioId")
-    List<Fatura> findByUsuarioId(String usuarioId);
+    @Query("SELECT f FROM Fatura f WHERE f.cartaoCredito.usuario.id = :usuarioId " +
+            "AND f.dataVencimento < :hoje AND f.statusPagamento <> :status")
+    List<Fatura> findVencidasPorUsuario(
+            @Param("usuarioId") String usuarioId,
+            @Param("hoje") LocalDate hoje,
+            @Param("status") StatusPagamento status
+    );
 }

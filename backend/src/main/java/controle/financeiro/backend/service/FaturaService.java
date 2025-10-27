@@ -52,13 +52,12 @@ public class FaturaService {
         return faturaMapper.toResponseDTOList(faturas);
     }
 
-    public List<FaturaResponseDTO> listarPorUsuario(String usuarioId) {
-        List<Fatura> faturas = faturaRepository.findByUsuarioId(usuarioId);
-        return faturaMapper.toResponseDTOList(faturas);
-    }
-
-    public List<FaturaResponseDTO> listarVencidas() {
-        List<Fatura> faturas = faturaRepository.findVencidas(LocalDate.now());
+    public List<FaturaResponseDTO> listarFaturasVencidas(String usuarioId) {
+        List<Fatura> faturas = faturaRepository.findVencidasPorUsuario(
+                usuarioId,
+                LocalDate.now(),
+                StatusPagamento.PAGO
+        );
         return faturaMapper.toResponseDTOList(faturas);
     }
 

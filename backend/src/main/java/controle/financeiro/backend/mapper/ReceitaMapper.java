@@ -33,7 +33,7 @@ public class ReceitaMapper {
 
         if (receita.getConta() != null) {
             dto.setContaId(receita.getConta().getId());
-            dto.setContaNome(receita.getConta().getTitulo());
+            dto.setContaNome(receita.getConta().getNome());
         }
 
         if (receita.getCategoria() != null) {

@@ -21,10 +21,4 @@ public interface CartaoCreditoRepository extends JpaRepository<CartaoCredito, St
 
     @Query("SELECT SUM(c.limiteTotal) FROM CartaoCredito c WHERE c.usuario.id = :usuarioId AND c.ativo = true")
     Double calcularLimiteTotalDisponivel(String usuarioId);
-
-    @Query("SELECT SUM(c.limiteDisponivel) FROM CartaoCredito c WHERE c.usuario.id = :usuarioId AND c.ativo = true")
-    Double calcularLimiteDisponivelTotal(String usuarioId);
-
-    @Query("SELECT c FROM CartaoCredito c WHERE c.usuario.id = :usuarioId AND c.limiteDisponivel < (c.limiteTotal * 0.2)")
-    List<CartaoCredito> findCartoesComLimiteBaixo(String usuarioId);
 }
