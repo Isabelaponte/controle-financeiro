@@ -1,6 +1,8 @@
 package controle.financeiro.backend.exception;
 
 import controle.financeiro.backend.exception.categoria.CategoriaNomeJaExisteException;
+import controle.financeiro.backend.exception.conta.ContaNomeJaExisteException;
+import controle.financeiro.backend.exception.conta.SaldoInsuficienteException;
 import controle.financeiro.backend.exception.usuario.EmailJaExisteException;
 import controle.financeiro.backend.exception.usuario.SenhaInvalidaException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -98,5 +100,27 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(ContaNomeJaExisteException.class)
+    public ResponseEntity<ErrorResponse> handleContaNomeJaExiste(ContaNomeJaExisteException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Erro ao processar conta",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<ErrorResponse> handleSaldoInsuficiente(SaldoInsuficienteException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Operação não permitida",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.badRequest().body(error);
     }
 }

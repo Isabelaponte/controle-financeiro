@@ -28,8 +28,11 @@ public class Conta {
     @Column
     private String tipo;
 
-    @Column
-    private Double saldo;
+    @Column(nullable = false)
+    private Double saldo = 0.0;
+
+    @Column(nullable = false)
+    private Boolean ativa = true;
 
     @ManyToOne
     @JoinColumn(name = "FK_USUARIO_ID")
