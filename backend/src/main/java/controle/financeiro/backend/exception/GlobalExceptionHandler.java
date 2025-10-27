@@ -1,5 +1,6 @@
 package controle.financeiro.backend.exception;
 
+import controle.financeiro.backend.exception.cartaoCredito.CartaoCreditoNomeJaExisteException;
 import controle.financeiro.backend.exception.categoria.CategoriaNomeJaExisteException;
 import controle.financeiro.backend.exception.conta.ContaNomeJaExisteException;
 import controle.financeiro.backend.exception.conta.SaldoInsuficienteException;
@@ -122,5 +123,16 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(CartaoCreditoNomeJaExisteException.class)
+    public ResponseEntity<ErrorResponse> handleCartaoNomeJaExiste(CartaoCreditoNomeJaExisteException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Erro ao processar cartão de crédito",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }

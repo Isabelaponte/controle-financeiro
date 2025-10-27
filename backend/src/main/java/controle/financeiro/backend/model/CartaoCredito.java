@@ -30,11 +30,14 @@ public class CartaoCredito {
     @Column(name = "limite_total", nullable = false)
     private Double limiteTotal;
 
-    @Column(name = "data_fechamento", nullable = false)
-    private Date dataFechamento;
+    @Column(name = "dia_fechamento", nullable = false)
+    private Integer diaFechamento;
 
-    @Column(name = "data_vencimento", nullable = false)
-    private Date dataVencimento;
+    @Column(name = "dia_vencimento", nullable = false)
+    private Integer diaVencimento;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 
     @ManyToOne
     @JoinColumn(name = "FK_USUARIO_ID")

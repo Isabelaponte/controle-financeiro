@@ -2,7 +2,7 @@ package controle.financeiro.backend.service;
 
 import controle.financeiro.backend.dto.request.conta.AtualizaContaDTO;
 import controle.financeiro.backend.dto.request.conta.CriaContaDTO;
-import controle.financeiro.backend.dto.response.conta.ContaResponseDTO;
+import controle.financeiro.backend.dto.response.ContaResponseDTO;
 import controle.financeiro.backend.exception.RecursoNaoEcontradoException;
 import controle.financeiro.backend.exception.conta.ContaNomeJaExisteException;
 import controle.financeiro.backend.exception.conta.SaldoInsuficienteException;

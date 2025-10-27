@@ -2,7 +2,7 @@ package controle.financeiro.backend.controller;
 
 import controle.financeiro.backend.dto.request.conta.AtualizaContaDTO;
 import controle.financeiro.backend.dto.request.conta.CriaContaDTO;
-import controle.financeiro.backend.dto.response.conta.ContaResponseDTO;
+import controle.financeiro.backend.dto.response.ContaResponseDTO;
 import controle.financeiro.backend.service.ContaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

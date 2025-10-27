@@ -2,7 +2,7 @@ package controle.financeiro.backend.mapper;
 
 import controle.financeiro.backend.dto.request.conta.AtualizaContaDTO;
 import controle.financeiro.backend.dto.request.conta.CriaContaDTO;
-import controle.financeiro.backend.dto.response.conta.ContaResponseDTO;
+import controle.financeiro.backend.dto.response.ContaResponseDTO;
 import controle.financeiro.backend.model.Categoria;
 import controle.financeiro.backend.model.Conta;
 import controle.financeiro.backend.model.Usuario;
