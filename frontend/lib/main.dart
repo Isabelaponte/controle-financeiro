@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
         title: 'Pig Finnance',
         debugShowCheckedModeBanner: false,
         initialRoute: AppRoutes.login,
-        routes: AppRoutes.routes,
+        routes: AppRoutes.getRoutes(),
       ),
     );
   }

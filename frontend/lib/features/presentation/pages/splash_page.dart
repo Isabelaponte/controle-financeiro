@@ -21,15 +21,14 @@ class _SplashPageState extends State<SplashPage> {
     final authProvider = context.read<AuthProvider>();
     await authProvider.initialize();
 
-    if (mounted) {
-      await Future.delayed(const Duration(seconds: 1));
+    if (!mounted) return;
 
-      if (authProvider.isAuthenticated) {
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
-      } else {
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
-      }
-    }
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted) return;
+
+    final route = authProvider.isAuthenticated ? AppRoutes.home : AppRoutes.login;
+    Navigator.pushReplacementNamed(context, route);
   }
 
   @override
@@ -40,16 +39,11 @@ class _SplashPageState extends State<SplashPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.lock_outline,
-              size: 100,
+              Icons.account_balance_wallet,
+              size: 80,
               color: Theme.of(context).primaryColor,
             ),
             const SizedBox(height: 24),
-            Text(
-              'Carregando...',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
             const CircularProgressIndicator(),
           ],
         ),
