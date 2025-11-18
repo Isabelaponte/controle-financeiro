@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/presentation/providers/auth_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MainApp());
@@ -10,11 +12,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Pig Finnance',
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.login,
-      routes: AppRoutes.routes,
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: MaterialApp(
+        title: 'Pig Finnance',
+        debugShowCheckedModeBanner: false,
+        initialRoute: AppRoutes.login,
+        routes: AppRoutes.routes,
+      ),
     );
   }
 }

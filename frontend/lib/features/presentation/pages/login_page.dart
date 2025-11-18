@@ -1,47 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/app_colors.dart';
+import 'package:frontend/features/presentation/providers/auth_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
+import 'package:provider/provider.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _RegisterPageState();
+  State<StatefulWidget> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _register() async {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simula uma chamada de API
-      await Future.delayed(const Duration(seconds: 2));
+      final authProvider = context.read<AuthProvider>();
+      final success = await authProvider.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
       setState(() => _isLoading = false);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cadastro realizado com sucesso!')),
-        );
-        Navigator.pop(context);
+        if (success) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                authProvider.errorMessage ?? 'Erro ao realizar login!',
+              ),
+              backgroundColor: AppColors.errorBackground,
+            ),
+          );
+        }
       }
     }
   }
@@ -67,20 +75,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Criar conta',
+                    'Fazer login',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.purpleDark,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Nome',
-                      labelStyle: TextStyle(color: AppColors.purpleDark),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -117,24 +116,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    keyboardType: TextInputType.visiblePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Confirmar senha',
-                      border: OutlineInputBorder(),
-                      labelStyle: TextStyle(color: AppColors.purpleDark),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                        ),
-                        onPressed: () {
-                          setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-                        },
-                      ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        // Implementar recuperação de senha
+                      },
+                      child: const Text('Esqueceu a senha?'),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -142,11 +130,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(
                     height: 50,
                     child: FilledButton(
-                      onPressed: _isLoading ? null : _register,
+                      onPressed: _isLoading ? null : _login,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.purple,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ), // 0 = totalmente quadrado
                         ),
                       ),
                       child: _isLoading
@@ -159,7 +149,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             )
                           : const Text(
-                              'Cadastrar',
+                              'Entrar',
                               style: TextStyle(fontSize: 16),
                             ),
                     ),
@@ -167,18 +157,45 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   const SizedBox(height: 16),
 
+                  // SizedBox(
+                  //   height: 50,
+                  //   child: OutlinedButton(
+                  //     onPressed: _isLoading ? null : _login,
+                  //     style: OutlinedButton.styleFrom(
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(
+                  //           8,
+                  //         ), // 0 = totalmente quadrado
+                  //       ),
+                  //     ),
+                  //     child: _isLoading
+                  //         ? const SizedBox(
+                  //             height: 20,
+                  //             width: 20,
+                  //             child: CircularProgressIndicator(
+                  //               strokeWidth: 2,
+                  //               color: Colors.white,
+                  //             ),
+                  //           )
+                  //         : const Text(
+                  //             'Cadastrar-se',
+                  //             style: TextStyle(fontSize: 16),
+                  //           ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Já possui uma conta? ',
+                        'Não tem uma conta? ',
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.login);
+                          Navigator.pushNamed(context, AppRoutes.register);
                         },
-                        child: const Text('Faça login'),
+                        child: const Text('Cadastre-se'),
                       ),
                     ],
                   ),
