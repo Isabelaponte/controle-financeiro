@@ -3,16 +3,17 @@ package controle.financeiro.backend.controller;
 import controle.financeiro.backend.dto.request.LoginRequestDTO;
 import controle.financeiro.backend.dto.request.RegistroRequestDTO;
 import controle.financeiro.backend.dto.response.LoginResponseDTO;
+import controle.financeiro.backend.exception.usuario.CredenciaisInvalidasException;
+import controle.financeiro.backend.exception.usuario.EmailJaExisteException;
 import controle.financeiro.backend.model.Usuario;
 import controle.financeiro.backend.repository.UsuarioRepository;
 import controle.financeiro.backend.security.TokenService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -26,33 +27,40 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequestDTO body) {
-        Usuario usuario = this.usuarioRepository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        if (passwordEncoder.matches(body.senha(), usuario.getSenha())) {
-            String token = this.tokenService.generateToken(usuario);
-            return ResponseEntity.ok(new LoginResponseDTO(usuario.getEmail(), token));
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO body) {
+        Optional<Usuario> usuarioOpt = this.usuarioRepository.findByEmail(body.email());
+
+        if (usuarioOpt.isEmpty() || !passwordEncoder.matches(body.senha(), usuarioOpt.get().getSenha())) {
+            throw new CredenciaisInvalidasException("Email ou senha incorretos");
         }
 
-        return ResponseEntity.badRequest().build();
+        Usuario usuario = usuarioOpt.get();
+        String token = this.tokenService.generateToken(usuario);
+
+        return ResponseEntity.ok(new LoginResponseDTO(usuario.getNomeUsuario(), token));
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegistroRequestDTO body) {
-        Optional<Usuario> usuario = this.usuarioRepository.findByEmail(body.email());
+    public ResponseEntity<LoginResponseDTO> register(@Valid @RequestBody RegistroRequestDTO body) {
 
-        if (usuario.isEmpty()) {
-            Usuario novoUsuario = new Usuario();
-            novoUsuario.setSenha(passwordEncoder.encode(body.senha()));
-            novoUsuario.setEmail(body.email());
-            novoUsuario.setNomeUsuario(body.username());
-
-            this.usuarioRepository.save(novoUsuario);
-
-            String token = this.tokenService.generateToken(novoUsuario);
-            return ResponseEntity.ok(new LoginResponseDTO(novoUsuario.getNomeUsuario(), token));
+        if (this.usuarioRepository.findByEmail(body.email()).isPresent()) {
+            throw new EmailJaExisteException("Email já cadastrado");
         }
 
-        return ResponseEntity.badRequest().build();
-    }
+        if (body.username() == null || body.username().trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome de usuário não pode ser vazio");
+        }
 
+        Usuario novoUsuario = new Usuario();
+        novoUsuario.setNomeUsuario(body.username().trim());
+        novoUsuario.setEmail(body.email().toLowerCase().trim());
+        novoUsuario.setSenha(passwordEncoder.encode(body.senha()));
+
+        this.usuarioRepository.save(novoUsuario);
+
+        String token = this.tokenService.generateToken(novoUsuario);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new LoginResponseDTO(novoUsuario.getNomeUsuario(), token));
+    }
 }

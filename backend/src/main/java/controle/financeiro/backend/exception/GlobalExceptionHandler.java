@@ -4,6 +4,7 @@ import controle.financeiro.backend.exception.cartaoCredito.CartaoCreditoNomeJaEx
 import controle.financeiro.backend.exception.categoria.CategoriaNomeJaExisteException;
 import controle.financeiro.backend.exception.conta.ContaNomeJaExisteException;
 import controle.financeiro.backend.exception.conta.SaldoInsuficienteException;
+import controle.financeiro.backend.exception.usuario.CredenciaisInvalidasException;
 import controle.financeiro.backend.exception.usuario.EmailJaExisteException;
 import controle.financeiro.backend.exception.usuario.SenhaInvalidaException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -67,6 +68,17 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ErrorResponse> handleCredenciaisInvalidas(CredenciaisInvalidasException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     @ExceptionHandler
