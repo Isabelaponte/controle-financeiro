@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                authProvider.errorMessage ?? 'Erro ao fazer cadastro',  
+                authProvider.errorMessage ?? 'Erro ao fazer cadastro',
               ),
               backgroundColor: AppColors.errorBackground,
             ),
@@ -63,6 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
