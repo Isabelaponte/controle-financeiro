@@ -4,6 +4,7 @@ import 'package:frontend/features/presentation/pages/home/widgets/resumo_cards.d
 import 'package:frontend/features/presentation/pages/home/widgets/secao_cartoes.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_contas.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
+import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
@@ -28,34 +29,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _carregarDados() async {
-    debugPrint('DEBUG: _carregarDados() iniciado');
-    
     final authProvider = context.read<AuthProvider>();
-    debugPrint('DEBUG: AuthProvider status = ${authProvider.status}');
-    
+
     final user = authProvider.user;
-    
+
     if (user == null) {
-      debugPrint('DEBUG: User é null');
       return;
     }
-
-    debugPrint('DEBUG: User ID = "${user.id}"');
 
     if (user.id.isEmpty) {
-      debugPrint('DEBUG: User ID está vazio!');
       return;
     }
 
-    debugPrint('DEBUG: Chamando contaProvider.carregarDados()');
     final contaProvider = context.read<ContaProvider>();
-    
+    final cartaoProvider = context.read<CartaoCreditoProvider>();
+
     try {
       await contaProvider.carregarDados(user.id);
-      debugPrint('DEBUG: carregarDados() concluído');
-      debugPrint('DEBUG: Contas carregadas = ${contaProvider.contas.length}');
-      debugPrint('DEBUG: Status = ${contaProvider.status}');
-      debugPrint('DEBUG: Erro = ${contaProvider.errorMessage}');
+      await cartaoProvider.carregarCartoes(user.id);
     } catch (e) {
       debugPrint('DEBUG: Erro ao carregar dados: $e');
     }
