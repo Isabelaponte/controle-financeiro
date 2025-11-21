@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/app_bar_content.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/resumo_cards.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_cartoes.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_contas.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
+import 'package:frontend/features/presentation/providers/conta_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend/core/app_colors.dart';
+import 'package:frontend/features/presentation/providers/auth_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,22 +20,85 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _carregarDados();
+    });
+  }
+
+  Future<void> _carregarDados() async {
+    debugPrint('DEBUG: _carregarDados() iniciado');
+    
+    final authProvider = context.read<AuthProvider>();
+    debugPrint('DEBUG: AuthProvider status = ${authProvider.status}');
+    
+    final user = authProvider.user;
+    
+    if (user == null) {
+      debugPrint('DEBUG: User é null');
+      return;
+    }
+
+    debugPrint('DEBUG: User ID = "${user.id}"');
+
+    if (user.id.isEmpty) {
+      debugPrint('DEBUG: User ID está vazio!');
+      return;
+    }
+
+    debugPrint('DEBUG: Chamando contaProvider.carregarDados()');
+    final contaProvider = context.read<ContaProvider>();
+    
+    try {
+      await contaProvider.carregarDados(user.id);
+      debugPrint('DEBUG: carregarDados() concluído');
+      debugPrint('DEBUG: Contas carregadas = ${contaProvider.contas.length}');
+      debugPrint('DEBUG: Status = ${contaProvider.status}');
+      debugPrint('DEBUG: Erro = ${contaProvider.errorMessage}');
+    } catch (e) {
+      debugPrint('DEBUG: Erro ao carregar dados: $e');
+    }
+
+    // Verifica se houve erro de autenticação
+    if (contaProvider.isAuthError) {
+      _handleAuthError();
+    }
+  }
+
+  void _handleAuthError() {
+    final authProvider = context.read<AuthProvider>();
+    authProvider.logout();
+  }
+
+  Future<void> _atualizarDados() async {
+    await _carregarDados();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(user?.name ?? 'Usuário'),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            children: const [
-              ResumoCards(),
-              SizedBox(height: 20),
-              SecaoContas(),
-              SizedBox(height: 10),
-              SecaoCartoes(),
-              SizedBox(height: 10),
-              SecaoMetas(),
-            ],
+        child: RefreshIndicator(
+          onRefresh: _atualizarDados,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: const [
+                ResumoCards(),
+                SizedBox(height: 20),
+                SecaoContas(),
+                SizedBox(height: 10),
+                SecaoCartoes(),
+                SizedBox(height: 10),
+                SecaoMetas(),
+              ],
+            ),
           ),
         ),
       ),
@@ -78,10 +144,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(String userName) {
     return AppBar(
       automaticallyImplyLeading: false,
-      title: const AppBarContent(),
+      title: AppBarContent(userName: userName),
       centerTitle: true,
       toolbarHeight: 140,
       shape: const RoundedRectangleBorder(
