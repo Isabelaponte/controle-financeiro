@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -37,7 +37,7 @@ public class AuthController {
         Usuario usuario = usuarioOpt.get();
         String token = this.tokenService.generateToken(usuario);
 
-        return ResponseEntity.ok(new LoginResponseDTO(usuario.getNomeUsuario(), token));
+        return ResponseEntity.ok(new LoginResponseDTO(usuario.getId() ,usuario.getNomeUsuario(), usuario.getEmail(), token));
     }
 
     @PostMapping("/register")
@@ -61,6 +61,6 @@ public class AuthController {
         String token = this.tokenService.generateToken(novoUsuario);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new LoginResponseDTO(novoUsuario.getNomeUsuario(), token));
+                .body(new LoginResponseDTO(novoUsuario.getId(), novoUsuario.getNomeUsuario(), novoUsuario.getEmail(), token));
     }
 }
