@@ -6,6 +6,7 @@ import 'package:frontend/features/presentation/pages/home/widgets/secao_contas.d
 import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
+import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/presentation/providers/auth_provider.dart';
@@ -43,10 +44,12 @@ class _HomePageState extends State<HomePage> {
 
     final contaProvider = context.read<ContaProvider>();
     final cartaoProvider = context.read<CartaoCreditoProvider>();
+    final metaProvider = context.read<MetaFinanceiraProvider>();
 
     try {
       await contaProvider.carregarDados(user.id);
       await cartaoProvider.carregarCartoes(user.id);
+      await metaProvider.carregarMetas(user.id);
     } catch (e) {
       debugPrint('DEBUG: Erro ao carregar dados: $e');
     }

@@ -31,6 +31,24 @@ class ApiConstants {
   static String desativarCartaoCredito(String id) =>
       '/cartoes-credito/$id/desativar';
 
+  // Endpoints de Metas Financeiras
+  static const String metasFinanceiras = '/metas-financeiras';
+  static String metaFinanceiraPorId(String id) => '/metas-financeiras/$id';
+  static String metasPorUsuario(String usuarioId) =>
+      '/metas-financeiras/usuario/$usuarioId';
+  static String metasEmAndamento(String usuarioId) =>
+      '/metas-financeiras/usuario/$usuarioId/em-andamento';
+  static String metasConcluidas(String usuarioId) =>
+      '/metas-financeiras/usuario/$usuarioId/concluidas';
+  static String resumoMetas(String usuarioId) =>
+      '/metas-financeiras/usuario/$usuarioId/resumo';
+  static String adicionarValorMeta(String id) =>
+      '/metas-financeiras/$id/adicionar-valor';
+  static String subtrairValorMeta(String id) =>
+      '/metas-financeiras/$id/subtrair-valor';
+  static String marcarMetaConcluida(String id) =>
+      '/metas-financeiras/$id/marcar-concluida';
+
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
