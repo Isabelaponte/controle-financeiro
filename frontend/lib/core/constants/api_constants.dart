@@ -49,6 +49,17 @@ class ApiConstants {
   static String marcarMetaConcluida(String id) =>
       '/metas-financeiras/$id/marcar-concluida';
 
+  // Endpoints de Faturas
+  static const String faturas = '/faturas';
+  static String faturaPorId(String id) => '/faturas/$id';
+  static String faturasPorCartao(String cartaoId) =>
+      '/faturas/cartao/$cartaoId';
+  static String faturasPendentesPorCartao(String cartaoId) =>
+      '/faturas/cartao/$cartaoId/pendentes';
+  static String faturasVencidas(String usuarioId) =>
+      '/faturas/vencidas/$usuarioId';
+  static String pagarFatura(String id) => '/faturas/$id/pagar';
+
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

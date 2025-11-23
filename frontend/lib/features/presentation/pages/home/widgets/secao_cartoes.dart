@@ -66,14 +66,14 @@ class SecaoCartoes extends StatelessWidget {
 
         final cartoes = provider.cartoesAtivos;
         final widgets = <Widget>[];
-        
+
         for (var i = 0; i < cartoes.length; i++) {
           widgets.add(CartaoTile(cartao: cartoes[i]));
           if (i < cartoes.length - 1) {
             widgets.add(const Divider());
           }
         }
-        
+
         return widgets;
 
       default:
@@ -91,18 +91,15 @@ class SecaoCartoes extends StatelessWidget {
 class CartaoTile extends StatelessWidget {
   final CartaoCreditoModel cartao;
 
-  // TODO: Isso deveria vir de uma API de faturas
-  // Por enquanto, usando valor mock
-  final double faturaAtual;
-
-  const CartaoTile({
-    super.key,
-    required this.cartao,
-    this.faturaAtual = 0.0,
-  });
+  const CartaoTile({super.key, required this.cartao});
 
   @override
   Widget build(BuildContext context) {
+    // Busca a fatura atual do provider
+    final provider = context.watch<CartaoCreditoProvider>();
+    final fatura = provider.getFaturaDoCartao(cartao.id);
+    final faturaAtual = fatura?.valorTotal ?? 0.0;
+
     final limiteDisponivel = cartao.calcularLimiteDisponivel(faturaAtual);
 
     return Padding(
@@ -130,10 +127,12 @@ class CartaoTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '- ${cartao.statusVencimento}',
+                        fatura != null
+                            ? '- ${fatura.statusVencimento}'
+                            : '- Sem fatura',
                         style: TextStyle(
-                          color: cartao.proximoVencimento 
-                              ? AppColors.red 
+                          color: fatura?.proximoVencimento == true
+                              ? AppColors.red
                               : AppColors.grayDark,
                           fontSize: 13,
                         ),
@@ -147,8 +146,8 @@ class CartaoTile extends StatelessWidget {
                       InfoColuna(
                         label: 'Disponível',
                         valor: cartao.formatarLimiteDisponivel(faturaAtual),
-                        corValor: limiteDisponivel > 0 
-                            ? AppColors.green 
+                        corValor: limiteDisponivel > 0
+                            ? AppColors.green
                             : AppColors.red,
                       ),
                       const SizedBox(width: 50),
@@ -164,14 +163,20 @@ class CartaoTile extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.purpleLight,
+                          color: fatura != null && !fatura.isPaga
+                              ? AppColors.purpleLight
+                              : AppColors.greenLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          faturaAtual > 0 ? "Aberta" : "Fechada",
+                          fatura != null && !fatura.isPaga
+                              ? "Aberta"
+                              : "Fechada",
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.purpleAccent,
+                            color: fatura != null && !fatura.isPaga
+                                ? AppColors.purpleAccent
+                                : AppColors.greenDark,
                           ),
                         ),
                       ),
@@ -204,6 +209,10 @@ class CartaoTile extends StatelessWidget {
   }
 
   void _mostrarDetalhesCartao(BuildContext context) {
+    final provider = context.read<CartaoCreditoProvider>();
+    final fatura = provider.getFaturaDoCartao(cartao.id);
+    final faturaAtual = fatura?.valorTotal ?? 0.0;
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -218,10 +227,22 @@ class CartaoTile extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _buildInfoRow('Limite total', cartao.limiteTotalFormatado),
-            _buildInfoRow('Disponível', cartao.formatarLimiteDisponivel(faturaAtual)),
+            _buildInfoRow(
+              'Disponível',
+              cartao.formatarLimiteDisponivel(faturaAtual),
+            ),
             _buildInfoRow('Fatura atual', cartao.formatarFatura(faturaAtual)),
             _buildInfoRow('Dia de fechamento', '${cartao.diaFechamento}'),
             _buildInfoRow('Dia de vencimento', '${cartao.diaVencimento}'),
+            if (fatura != null) ...[
+              const Divider(),
+              _buildInfoRow(
+                'Status da fatura',
+                fatura.statusPagamento.displayName,
+              ),
+              if (fatura.vencida)
+                _buildInfoRow('Situação', 'VENCIDA', isError: true),
+            ],
             if (cartao.categoriaNome != null)
               _buildInfoRow('Categoria', cartao.categoriaNome!),
             const SizedBox(height: 20),
@@ -243,7 +264,10 @@ class CartaoTile extends StatelessWidget {
                     await provider.desativarCartao(cartao.id);
                   },
                   icon: Icon(Icons.block, color: AppColors.red),
-                  label: Text('Desativar', style: TextStyle(color: AppColors.red)),
+                  label: Text(
+                    'Desativar',
+                    style: TextStyle(color: AppColors.red),
+                  ),
                 ),
               ],
             ),
@@ -253,14 +277,20 @@ class CartaoTile extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, {bool isError = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(color: AppColors.grayDark)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: isError ? AppColors.red : null,
+            ),
+          ),
         ],
       ),
     );
