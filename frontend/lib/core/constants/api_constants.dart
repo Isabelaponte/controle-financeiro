@@ -60,6 +60,47 @@ class ApiConstants {
       '/faturas/vencidas/$usuarioId';
   static String pagarFatura(String id) => '/faturas/$id/pagar';
 
+  // Endpoints de Receitas
+  static const String receitas = '/receitas';
+  static String receitaPorId(String id) => '/receitas/$id';
+  static String receitasPorUsuario(String usuarioId) =>
+      '/receitas/usuario/$usuarioId';
+  static String receitasPorStatus(String usuarioId, bool recebida) =>
+      '/receitas/usuario/$usuarioId/status?recebida=$recebida';
+  static String receitasPorPeriodo(
+    String usuarioId,
+    String dataInicio,
+    String dataFim,
+  ) =>
+      '/receitas/usuario/$usuarioId/periodo?dataInicio=$dataInicio&dataFim=$dataFim';
+  static String receitasFixas(String usuarioId) =>
+      '/receitas/usuario/$usuarioId/fixas';
+  static String receitasAtrasadas(String usuarioId) =>
+      '/receitas/usuario/$usuarioId/atrasadas';
+  static String resumoReceitas(String usuarioId) =>
+      '/receitas/usuario/$usuarioId/resumo';
+  static String marcarReceitaRecebida(String id) =>
+      '/receitas/$id/marcar-recebida';
+  static String desmarcarReceitaRecebida(String id) =>
+      '/receitas/$id/desmarcar-recebida';
+
+  // Endpoints de Despesas Gerais
+  static const String despesasGerais = '/despesas-gerais';
+  static String despesaGeralPorId(String id) => '/despesas-gerais/$id';
+  static String despesasGeraisPorUsuario(String usuarioId) =>
+      '/despesas-gerais/usuario/$usuarioId';
+  static String pagarDespesaGeral(String id) => '/despesas-gerais/$id/pagar';
+
+  // Endpoints de Despesas de Cartão
+  static const String despesasCartao = '/despesas-cartao';
+  static String despesaCartaoPorId(String id) => '/despesas-cartao/$id';
+  static String despesasCartaoPorUsuario(String usuarioId) =>
+      '/despesas-cartao/usuario/$usuarioId';
+  static String despesasCartaoPorCartao(String cartaoId) =>
+      '/despesas-cartao/cartao/$cartaoId';
+  static String despesasCartaoPorFatura(String faturaId) =>
+      '/despesas-cartao/fatura/$faturaId';
+
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

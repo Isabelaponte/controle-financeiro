@@ -4,6 +4,7 @@ import 'package:frontend/features/presentation/providers/auth_provider.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
 import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
+import 'package:frontend/features/presentation/providers/transacao_provider.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +23,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ContaProvider()),
         ChangeNotifierProvider(create: (_) => CartaoCreditoProvider()),
         ChangeNotifierProvider(create: (_) => MetaFinanceiraProvider()),
+        ChangeNotifierProvider(create: (_) => TransacaoProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(scaffoldBackgroundColor: AppColors.backgroundLight),
