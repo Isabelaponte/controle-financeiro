@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/presentation/pages/home/home_page.dart';
+import 'package:frontend/features/presentation/navigation/main_navigator.dart';
 import 'package:frontend/features/presentation/pages/login_page.dart';
 import 'package:frontend/features/presentation/pages/register_page.dart';
 import 'package:frontend/features/presentation/pages/splash_page.dart';
@@ -20,7 +20,7 @@ class AppRoutes {
       register: (context) =>
           const AuthGuard(requireAuth: false, child: RegisterPage()),
 
-      home: (context) => const AuthGuard(requireAuth: true, child: HomePage()),
+      home: (context) => const AuthGuard(requireAuth: true, child: MainNavigator()),
     };
   }
 }

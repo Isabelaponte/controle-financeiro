@@ -4,9 +4,7 @@ import 'package:frontend/features/presentation/pages/home/widgets/resumo_cards.d
 import 'package:frontend/features/presentation/pages/home/widgets/secao_cartoes.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_contas.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
-import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
-import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/presentation/providers/auth_provider.dart';
@@ -19,54 +17,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _carregarDados();
-    });
-  }
-
-  Future<void> _carregarDados() async {
+  Future<void> _atualizarDados() async {
     final authProvider = context.read<AuthProvider>();
-
     final user = authProvider.user;
 
-    if (user == null) {
-      return;
-    }
-
-    if (user.id.isEmpty) {
-      return;
-    }
+    if (user == null) return;
 
     final contaProvider = context.read<ContaProvider>();
-    final cartaoProvider = context.read<CartaoCreditoProvider>();
-    final metaProvider = context.read<MetaFinanceiraProvider>();
-
-    try {
-      await contaProvider.carregarDados(user.id);
-      await cartaoProvider.carregarCartoes(user.id);
-      await metaProvider.carregarMetas(user.id);
-    } catch (e) {
-      debugPrint('DEBUG: Erro ao carregar dados: $e');
-    }
-
-    // Verifica se houve erro de autenticação
-    if (contaProvider.isAuthError) {
-      _handleAuthError();
-    }
-  }
-
-  void _handleAuthError() {
-    final authProvider = context.read<AuthProvider>();
-    authProvider.logout();
-  }
-
-  Future<void> _atualizarDados() async {
-    await _carregarDados();
+    await contaProvider.carregarDados(user.id);
   }
 
   @override
@@ -96,45 +54,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      onTap: (index) => setState(() => _currentIndex = index),
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: AppColors.purpleDark,
-      unselectedItemColor: AppColors.grayDark,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      items: [
-        const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet_outlined),
-          label: 'Carteira',
-        ),
-        BottomNavigationBarItem(
-          icon: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.purpleLight,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.add, color: AppColors.purpleDark),
-          ),
-          label: 'Adicionar',
-        ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
-          label: 'Estatísticas',
-        ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: 'Perfil',
-        ),
-      ],
     );
   }
 
