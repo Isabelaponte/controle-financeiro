@@ -56,4 +56,10 @@ public class CategoriaController {
         CategoriaResponseDTO desativada = categoriaService.desativar(id);
         return ResponseEntity.ok(desativada);
     }
+
+    @PatchMapping("/{id}/ativar")
+    public ResponseEntity<CategoriaResponseDTO> ativar(@PathVariable String id) {
+        CategoriaResponseDTO desativada = categoriaService.ativar(id);
+        return ResponseEntity.ok(desativada);
+    }
 }

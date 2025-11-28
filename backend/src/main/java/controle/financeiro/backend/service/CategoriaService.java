@@ -89,4 +89,14 @@ public class CategoriaService {
 
         return categoriaMapper.toResponseDTO(desativada);
     }
+
+    public CategoriaResponseDTO ativar(String id) {
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEcontradoException("Categoria não encontrada"));
+
+        categoria.setAtivo(true);
+        Categoria desativada = categoriaRepository.save(categoria);
+
+        return categoriaMapper.toResponseDTO(desativada);
+    }
 }
