@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/models/conta_model.dart';
+import 'package:frontend/features/presentation/pages/conta/conta_form_page.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
 import 'package:frontend/features/shared/widgets/logo_container.dart';
 import 'package:frontend/features/shared/widgets/secao_card.dart';
@@ -72,9 +73,9 @@ class SecaoContas extends StatelessWidget {
   }
 
   void _mostrarDialogAdicionarConta(BuildContext context) {
-    // TODO: Implementar dialog para adicionar conta
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Adicionar conta - Em desenvolvimento')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ContaFormPage()),
     );
   }
 }
@@ -146,9 +147,23 @@ class ContaTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.pop(context);
-                    // TODO: Editar conta
+                    final resultado = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ContaFormPage(conta: conta),
+                      ),
+                    );
+                    // Se retornou true, significa que foi editado com sucesso
+                    if (resultado == true && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Conta atualizada!'),
+                          backgroundColor: AppColors.green,
+                        ),
+                      );
+                    }
                   },
                   icon: const Icon(Icons.edit),
                   label: const Text('Editar'),

@@ -121,6 +121,41 @@ class CartaoCreditoProvider extends ChangeNotifier {
     }
   }
 
+  /// Atualiza um cartão existente
+  Future<bool> atualizarCartao(
+    String id, {
+    String? nome,
+    String? icone,
+    double? limiteTotal,
+    int? diaFechamento,
+    int? diaVencimento,
+    String? categoriaId,
+  }) async {
+    try {
+      final cartaoAtualizado = await _cartaoService.atualizar(
+        id,
+        nome: nome,
+        icone: icone,
+        limiteTotal: limiteTotal,
+        diaFechamento: diaFechamento,
+        diaVencimento: diaVencimento,
+        categoriaId: categoriaId,
+      );
+
+      final index = _cartoes.indexWhere((c) => c.id == id);
+      if (index != -1) {
+        _cartoes[index] = cartaoAtualizado;
+      }
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Altera o limite de um cartão
   Future<bool> alterarLimite(String id, double novoLimite) async {
     try {

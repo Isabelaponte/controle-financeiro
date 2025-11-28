@@ -134,6 +134,34 @@ class ContaProvider extends ChangeNotifier {
     }
   }
 
+  /// Atualiza uma conta existente
+  Future<bool> atualizarConta(
+    String id, {
+    String? nome,
+    String? tipo,
+    String? icone,
+  }) async {
+    try {
+      final contaAtualizada = await _contaService.atualizar(
+        id,
+        nome: nome,
+        tipo: tipo,
+        icone: icone,
+      );
+      final index = _contas.indexWhere((c) => c.id == id);
+      if (index != -1) {
+        _contas[index] = contaAtualizada;
+      }
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Desativa uma conta
   Future<bool> desativarConta(String id) async {
     try {

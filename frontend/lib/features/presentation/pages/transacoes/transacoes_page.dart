@@ -17,27 +17,136 @@ class TransacoesPage extends StatefulWidget {
 
 class _TransacoesPageState extends State<TransacoesPage> {
   String _selectedFilter = 'Geral';
-  String _selectedMonth = 'Novembro 2025';
+  late String _selectedMonth;
+  late List<String> _meses;
 
-  // TODO: Substituir por dados reais da API
-  final List<String> _meses = [
-    'Agosto 2025',
-    'Setembro 2025',
-    'Outubro 2025',
-    'Novembro 2025',
-  ];
-
-  // Mock de transações para demonstração
-  List<TransacaoModel> get _transacoesMock {
-    return context.watch<TransacaoProvider>().transacoes;
+  @override
+  void initState() {
+    super.initState();
+    _meses = _gerarListaMeses();
+    _selectedMonth = _meses.first; // Seleciona o mês atual por padrão
+    
+    // Carrega os dados assim que a tela é criada
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _carregarDadosIniciais();
+    });
   }
 
-  double get _balancoTotal {
-    return context.watch<TransacaoProvider>().balancoTotal;
+  List<String> _gerarListaMeses() {
+    final agora = DateTime.now();
+    final List<String> meses = [];
+    
+    // Gera últimos 12 meses
+    for (int i = 0; i < 12; i++) {
+      final mes = DateTime(agora.year, agora.month - i, 1);
+      meses.add(_formatarMesAno(mes));
+    }
+    
+    return meses;
   }
 
-  Map<String, List<TransacaoModel>> get _transacoesAgrupadas {
-    return context.watch<TransacaoProvider>().transacoesAgrupadas;
+  String _formatarMesAno(DateTime data) {
+    final meses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    return '${meses[data.month - 1]} ${data.year}';
+  }
+
+  Future<void> _carregarDadosIniciais() async {
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.user;
+    
+    if (user == null) return;
+
+    final transacaoProvider = context.read<TransacaoProvider>();
+    
+    // Só carrega se ainda não tiver dados ou se estiver no estado inicial
+    if (transacaoProvider.status == TransacaoStatus.initial || 
+        transacaoProvider.transacoes.isEmpty) {
+      await transacaoProvider.carregarTransacoes(user.id);
+    }
+  }
+
+  // Transações filtradas
+  List<TransacaoModel> get _transacoesFiltradas {
+    final provider = context.watch<TransacaoProvider>();
+    var transacoes = provider.transacoes;
+
+    // Aplica filtro de tipo (Geral ou Cartões)
+    if (_selectedFilter == 'Cartões') {
+      transacoes = transacoes.where((t) => t.tipo == TipoTransacao.despesaCartao).toList();
+    }
+
+    // Aplica filtro de mês
+    final mesSelecionado = _obterMesSelecionado();
+    if (mesSelecionado != null) {
+      transacoes = transacoes.where((t) {
+        return t.data.month == mesSelecionado.month && 
+               t.data.year == mesSelecionado.year;
+      }).toList();
+    }
+
+    return transacoes;
+  }
+
+  double get _balancoTotalFiltrado {
+    double total = 0.0;
+    for (var transacao in _transacoesFiltradas) {
+      if (transacao.isReceita) {
+        total += transacao.valor;
+      } else {
+        total -= transacao.valor;
+      }
+    }
+    return total;
+  }
+
+  Map<String, List<TransacaoModel>> get _transacoesAgrupadasFiltradas {
+    final Map<String, List<TransacaoModel>> agrupadas = {};
+    
+    for (var transacao in _transacoesFiltradas) {
+      final dataKey = _formatarDataGrupo(transacao.data);
+      if (!agrupadas.containsKey(dataKey)) {
+        agrupadas[dataKey] = [];
+      }
+      agrupadas[dataKey]!.add(transacao);
+    }
+    
+    return agrupadas;
+  }
+
+  String _formatarDataGrupo(DateTime data) {
+    final diasSemana = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'];
+    final meses = [
+      'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+    ];
+    
+    final diaSemana = diasSemana[data.weekday % 7];
+    final dia = data.day;
+    final mes = meses[data.month - 1];
+    
+    return '$diaSemana, $dia de $mes';
+  }
+
+  DateTime? _obterMesSelecionado() {
+    // Extrai mês e ano do texto selecionado
+    final partes = _selectedMonth.split(' ');
+    if (partes.length != 2) return null;
+    
+    final mesesMap = {
+      'Janeiro': 1, 'Fevereiro': 2, 'Março': 3, 'Abril': 4,
+      'Maio': 5, 'Junho': 6, 'Julho': 7, 'Agosto': 8,
+      'Setembro': 9, 'Outubro': 10, 'Novembro': 11, 'Dezembro': 12
+    };
+    
+    final mes = mesesMap[partes[0]];
+    final ano = int.tryParse(partes[1]);
+    
+    if (mes == null || ano == null) return null;
+    
+    return DateTime(ano, mes);
   }
 
   @override
@@ -54,7 +163,7 @@ class _TransacoesPageState extends State<TransacoesPage> {
               child: _buildBody(provider),
             ),
           ),
-          BalancoTotal(valor: _balancoTotal),
+          BalancoTotal(valor: _balancoTotalFiltrado),
         ],
       ),
     );
@@ -94,7 +203,6 @@ class _TransacoesPageState extends State<TransacoesPage> {
               months: _meses,
               onChanged: (month) {
                 setState(() => _selectedMonth = month);
-                // TODO: Carregar transações do mês selecionado
               },
             ),
           ),
@@ -104,16 +212,15 @@ class _TransacoesPageState extends State<TransacoesPage> {
           FilterChips(
             onFilterChanged: (filter) {
               setState(() => _selectedFilter = filter);
-              // TODO: Filtrar transações
             },
           ),
           const SizedBox(height: 30),
 
           // Lista de transações agrupadas por data
-          if (_transacoesMock.isEmpty)
+          if (_transacoesFiltradas.isEmpty)
             _buildEmptyState()
           else
-            ..._transacoesAgrupadas.entries.map((entry) {
+            ..._transacoesAgrupadasFiltradas.entries.map((entry) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: SecaoTransacoes(

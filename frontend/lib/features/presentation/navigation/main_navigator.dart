@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/presentation/pages/estatisticas/estatisticas_page.dart';
 import 'package:frontend/features/presentation/pages/home/home_page.dart';
+import 'package:frontend/features/presentation/pages/page_para_coisar.dart';
 import 'package:frontend/features/presentation/pages/perfil/perfil_page.dart';
 import 'package:frontend/features/presentation/pages/transacoes/transacoes_page.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
@@ -28,7 +29,7 @@ class _MainNavigatorState extends State<MainNavigator> {
     _pages = [
       const HomePage(),
       const TransacoesPage(),
-      // const AdicionarTransacaoPage(),
+      const PageParaCoisar(),
       const EstatisticasPage(),
       const PerfilPage(),
     ];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/models/catao_model.dart';
+import 'package:frontend/features/presentation/pages/cartao/cartao_form_page.dart';
+import 'package:frontend/features/presentation/providers/auth_provider.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/shared/widgets/info_coluna.dart';
 import 'package:frontend/features/shared/widgets/logo_container.dart';
@@ -16,7 +18,7 @@ class SecaoCartoes extends StatelessWidget {
       builder: (context, provider, _) {
         return SecaoCard(
           titulo: "Cartões de crédito",
-          onAdd: () => _mostrarDialogAdicionarCartao(context),
+          onAdd: () => _navegarParaFormulario(context),
           children: _buildContent(provider),
         );
       },
@@ -81,10 +83,23 @@ class SecaoCartoes extends StatelessWidget {
     }
   }
 
-  void _mostrarDialogAdicionarCartao(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Adicionar cartão - Em desenvolvimento')),
+  Future<void> _navegarParaFormulario(
+    BuildContext context, {
+    CartaoCreditoModel? cartao,
+  }) async {
+    final resultado = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CartaoFormPage(cartao: cartao)),
     );
+
+    // Se retornou true, houve sucesso na operação
+    if (resultado == true && context.mounted) {
+      final provider = context.read<CartaoCreditoProvider>();
+      final authProvider = context.read<AuthProvider>();
+      if (authProvider.user != null) {
+        await provider.carregarCartoes(authProvider.user!.id);
+      }
+    }
   }
 }
 
@@ -250,9 +265,9 @@ class CartaoTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.pop(context);
-                    // TODO: Editar cartão
+                    await _navegarParaEdicao(context);
                   },
                   icon: const Icon(Icons.edit),
                   label: const Text('Editar'),
@@ -275,6 +290,22 @@ class CartaoTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _navegarParaEdicao(BuildContext context) async {
+    final resultado = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CartaoFormPage(cartao: cartao)),
+    );
+
+    // Se retornou true, houve sucesso na operação
+    if (resultado == true && context.mounted) {
+      final provider = context.read<CartaoCreditoProvider>();
+      final authProvider = context.read<AuthProvider>();
+      if (authProvider.user != null) {
+        await provider.carregarCartoes(authProvider.user!.id);
+      }
+    }
   }
 
   Widget _buildInfoRow(String label, String value, {bool isError = false}) {

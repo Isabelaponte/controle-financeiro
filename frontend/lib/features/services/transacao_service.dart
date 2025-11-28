@@ -17,9 +17,9 @@ class TransacaoService {
     ]);
 
     final List<TransacaoModel> todasTransacoes = [];
-    todasTransacoes.addAll(results[0] as List<TransacaoModel>);
-    todasTransacoes.addAll(results[1] as List<TransacaoModel>);
-    todasTransacoes.addAll(results[2] as List<TransacaoModel>);
+    todasTransacoes.addAll(results[0]);
+    todasTransacoes.addAll(results[1]);
+    todasTransacoes.addAll(results[2]);
 
     // Ordena por data (mais recente primeiro)
     todasTransacoes.sort((a, b) => b.data.compareTo(a.data));
