@@ -3,3 +3,5 @@ export 'logo_container.dart';
 export 'info_coluna.dart';
 export 'month_dropdown.dart';
 export 'filter_chips.dart';
+export 'icon_picker.dart';
+export 'color_picker.dart';

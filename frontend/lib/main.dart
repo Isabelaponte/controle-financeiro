@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/presentation/providers/auth_provider.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
+import 'package:frontend/features/presentation/providers/categoria_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
 import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
 import 'package:frontend/features/presentation/providers/transacao_provider.dart';
@@ -24,6 +25,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartaoCreditoProvider()),
         ChangeNotifierProvider(create: (_) => MetaFinanceiraProvider()),
         ChangeNotifierProvider(create: (_) => TransacaoProvider()),
+        ChangeNotifierProvider(create: (_) => CategoriaProvider()),
       ],
       child: MaterialApp(
         theme: ThemeData(scaffoldBackgroundColor: AppColors.backgroundLight),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/presentation/pages/categoria/categorias_page.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
@@ -14,9 +15,10 @@ class PerfilPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil'),
+        title: const Text('Mais opções', style: TextStyle(fontSize: 16)),
         backgroundColor: AppColors.purpleLight,
         foregroundColor: AppColors.purpleDark,
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(15),
@@ -60,96 +62,93 @@ class PerfilPage extends StatelessWidget {
             const SizedBox(height: 32),
 
             // Opções do perfil
-            Card(
-              color: AppColors.backgroundCard,
-              child: Column(
-                children: [
-                  _buildMenuOption(
-                    icon: Icons.person,
-                    titulo: 'Editar Perfil',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Em desenvolvimento')),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _buildMenuOption(
-                    icon: Icons.lock,
-                    titulo: 'Alterar Senha',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Em desenvolvimento')),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _buildMenuOption(
-                    icon: Icons.notifications,
-                    titulo: 'Notificações',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Em desenvolvimento')),
-                      );
-                    },
-                  ),
-                ],
-              ),
+            Column(
+              children: [
+                _buildMenuOption(
+                  icon: Icons.credit_card,
+                  titulo: 'Cartões de crédito',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CategoriasPage(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _buildMenuOption(
+                  icon: Icons.account_balance_wallet,
+                  titulo: 'Contas',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CategoriasPage(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _buildMenuOption(
+                  icon: Icons.flag,
+                  titulo: 'Minhas Metas',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CategoriasPage(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _buildMenuOption(
+                  icon: Icons.category,
+                  titulo: 'Categorias',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CategoriasPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
 
-            Card(
-              color: AppColors.backgroundCard,
-              child: Column(
-                children: [
-                  _buildMenuOption(
-                    icon: Icons.category,
-                    titulo: 'Gerenciar Categorias',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Em desenvolvimento')),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _buildMenuOption(
-                    icon: Icons.settings,
-                    titulo: 'Configurações',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Em desenvolvimento')),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _buildMenuOption(
-                    icon: Icons.help,
-                    titulo: 'Ajuda e Suporte',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Em desenvolvimento')),
-                      );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  _buildMenuOption(
-                    icon: Icons.info,
-                    titulo: 'Sobre',
-                    onTap: () {
-                      showAboutDialog(
-                        context: context,
-                        applicationName: 'Controle Financeiro',
-                        applicationVersion: '1.0.0',
-                        applicationIcon: Icon(
-                          Icons.savings,
-                          size: 48,
-                          color: AppColors.purpleDark,
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+            const SizedBox(height: 24),
+
+            Column(
+              children: [
+                _buildMenuOption(
+                  icon: Icons.settings,
+                  titulo: 'Configurações',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Em desenvolvimento')),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _buildMenuOption(
+                  icon: Icons.info,
+                  titulo: 'Sobre',
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: 'Controle Financeiro',
+                      applicationVersion: '1.0.0',
+                      applicationIcon: Icon(
+                        Icons.savings,
+                        size: 48,
+                        color: AppColors.purpleDark,
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 32),
 

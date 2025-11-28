@@ -38,14 +38,14 @@ class AppBarContent extends StatelessWidget {
                     Text(userName, style: const TextStyle(fontSize: 16)),
                   ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.notifications_outlined,
-                    color: AppColors.purpleDark,
-                    size: 28,
-                  ),
-                  onPressed: () {},
-                ),
+                // IconButton(
+                //   icon: Icon(
+                //     Icons.notifications_outlined,
+                //     color: AppColors.purpleDark,
+                //     size: 28,
+                //   ),
+                //   onPressed: () {},
+                // ),
               ],
             ),
             const SizedBox(height: 8),
