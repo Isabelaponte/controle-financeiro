@@ -69,7 +69,7 @@ public class ReceitaMapper {
         receita.setFixa(dto.getFixa());
         receita.setRepete(dto.getRepete());
         receita.setPeriodo(dto.getPeriodo());
-        receita.setRecebida(false);
+        receita.setRecebida(dto.getRecebida());
         receita.setConta(conta);
         receita.setCategoria(categoria);
         receita.setUsuario(usuario);

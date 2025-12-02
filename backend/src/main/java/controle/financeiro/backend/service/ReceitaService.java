@@ -27,6 +27,7 @@ import java.util.Map;
 @Transactional
 public class ReceitaService {
 
+    private final ContaService contaService;
     private final ReceitaRepository receitaRepository;
     private final UsuarioRepository usuarioRepository;
     private final ContaRepository contaRepository;
@@ -55,6 +56,11 @@ public class ReceitaService {
         }
 
         Receita receita = receitaMapper.toEntity(dto, conta, categoria, usuario);
+
+        if (receita.getRecebida() == true) {
+            contaService.adicionarSaldo(conta.getId(), receita.getValor());
+        }
+
         Receita salva = receitaRepository.save(receita);
 
         return receitaMapper.toResponseDTO(salva);

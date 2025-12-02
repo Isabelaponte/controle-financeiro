@@ -16,6 +16,7 @@ public class DespesaGeralResponseDTO {
     private Double valor;
     private String descricao;
     private LocalDate dataDespesa;
+    private LocalDate dataVencimento;
     private LocalDate lembrete;
     private Boolean pago;
     private Integer periodo;

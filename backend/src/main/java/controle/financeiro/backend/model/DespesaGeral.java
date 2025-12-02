@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -21,6 +22,9 @@ public class DespesaGeral extends Despesa{
 
     @Column
     private Boolean repetir;
+
+    @Column (name = "data_vencimento")
+    private LocalDate dataVencimento;
 
     @ManyToOne
     @JoinColumn(name = "FK_CONTA_ID")

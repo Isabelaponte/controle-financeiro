@@ -20,8 +20,9 @@ public class CriaDespesaGeralDTO {
 
     private String descricao;
 
-    @NotNull(message = "Data da despesa é obrigatória")
-    private LocalDate dataDespesa;
+    private LocalDate dataDespesa = LocalDate.now();
+
+    private LocalDate dataVencimento;
 
     private LocalDate lembrete;
 
@@ -35,7 +36,9 @@ public class CriaDespesaGeralDTO {
 
     private Integer periodo;
 
-    private Boolean repetir = false;
+    private Boolean repetir;
 
-    private StatusPagamento statusPagamento = StatusPagamento.PENDENTE;
+    private Boolean pago;
+
+    private StatusPagamento statusPagamento;
 }

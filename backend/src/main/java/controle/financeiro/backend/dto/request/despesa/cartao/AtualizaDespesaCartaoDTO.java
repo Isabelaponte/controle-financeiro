@@ -23,6 +23,8 @@ public class AtualizaDespesaCartaoDTO {
     private LocalDate lembrete;
 
     private Boolean pago;
+    // a ideia é pagar a fatura e nao a despesa do cartao... devemos melhorar essa logica pra funcionar corrretamente.
+    // Se a fatura estiver paga, aí sim a despesa relacionada a ela fica paga também
 
     private String categoriaId;
 

@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -25,6 +26,7 @@ import java.util.List;
 @Transactional
 public class DespesaGeralService {
 
+    private final ContaService contaService;
     private final DespesaGeralRepository despesaGeralRepository;
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
@@ -45,6 +47,23 @@ public class DespesaGeralService {
         }
 
         DespesaGeral despesa = despesaGeralMapper.toEntity(dto, usuario, categoria, conta);
+
+        System.out.println(despesa);
+
+        if (despesa.getPago()) {
+            despesa.setStatusPagamento(StatusPagamento.PAGO);
+        } else {
+            despesa.setStatusPagamento(StatusPagamento.PENDENTE);
+        }
+
+        if (!despesa.getPago() && despesa.getDataVencimento().isAfter(LocalDate.now())) {
+            despesa.setStatusPagamento(StatusPagamento.ATRASADO);
+        }
+
+        if (despesa.getPago()) {
+            contaService.subtrairSaldo(conta.getId(), despesa.getValor());
+        }
+
         DespesaGeral salva = despesaGeralRepository.save(despesa);
 
         return despesaGeralMapper.toResponseDTO(salva);
@@ -80,6 +99,20 @@ public class DespesaGeralService {
         if (dto.getContaId() != null) {
             conta = contaRepository.findById(dto.getContaId())
                     .orElseThrow(() -> new RecursoNaoEcontradoException("Conta não encontrada"));
+        }
+
+        if (despesa.getPago()) {
+            despesa.setStatusPagamento(StatusPagamento.PAGO);
+        } else {
+            despesa.setStatusPagamento(StatusPagamento.PENDENTE);
+        }
+
+        if (!despesa.getPago() && despesa.getDataVencimento().isAfter(LocalDate.now())) {
+            despesa.setStatusPagamento(StatusPagamento.ATRASADO);
+        }
+
+        if (despesa.getPago()) {
+            contaService.subtrairSaldo(conta.getId(), despesa.getValor());
         }
 
         despesaGeralMapper.updateEntity(dto, despesa, categoria, conta);

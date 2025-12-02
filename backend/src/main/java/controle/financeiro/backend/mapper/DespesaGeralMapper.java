@@ -32,6 +32,7 @@ public class DespesaGeralMapper {
         dto.setStatusPagamento(despesa.getStatusPagamento());
         dto.setDataCriacao(despesa.getDataCriacao());
         dto.setDataAtualizacao(despesa.getDataAtualizacao());
+        dto.setDataVencimento(despesa.getDataVencimento());
 
         if (despesa.getUsuario() != null) {
             dto.setUsuarioId(despesa.getUsuario().getId());
@@ -62,8 +63,9 @@ public class DespesaGeralMapper {
         despesa.setValor(dto.getValor());
         despesa.setDescricao(dto.getDescricao());
         despesa.setDataDespesa(dto.getDataDespesa());
+        despesa.setDataVencimento(dto.getDataVencimento());
         despesa.setLembrete(dto.getLembrete());
-        despesa.setPago(false);
+        despesa.setPago(dto.getPago());
         despesa.setPeriodo(dto.getPeriodo());
         despesa.setRepetir(dto.getRepetir());
         despesa.setStatusPagamento(dto.getStatusPagamento());

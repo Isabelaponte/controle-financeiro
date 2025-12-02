@@ -33,6 +33,8 @@ public class CriaReceitaDTO {
 
     private Boolean repete = false;
 
+    private Boolean recebida = false;
+
     @Min(value = 1, message = "Período deve ser no mínimo 1 mês")
     @Max(value = 120, message = "Período deve ser no máximo 120 meses")
     private Integer periodo;
