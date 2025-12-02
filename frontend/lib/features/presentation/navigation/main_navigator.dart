@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/presentation/pages/despesa/despesa_cartao_form_page.dart';
+import 'package:frontend/features/presentation/pages/despesa/despesa_geral_form_page.dart';
 import 'package:frontend/features/presentation/pages/estatisticas/estatisticas_page.dart';
 import 'package:frontend/features/presentation/pages/home/home_page.dart';
 import 'package:frontend/features/presentation/pages/page_para_coisar.dart';
 import 'package:frontend/features/presentation/pages/perfil/perfil_page.dart';
+import 'package:frontend/features/presentation/pages/receitas/receita_form_page.dart';
 import 'package:frontend/features/presentation/pages/transacoes/transacoes_page.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
@@ -86,7 +89,6 @@ class _MainNavigatorState extends State<MainNavigator> {
       currentIndex: _currentIndex,
       onTap: (index) {
         if (index == 2) {
-          // Botão central - mostrar modal
           _mostrarOpcoesAdicionar();
         } else {
           setState(() => _currentIndex = index);
@@ -146,45 +148,44 @@ class _MainNavigatorState extends State<MainNavigator> {
             ),
             const SizedBox(height: 20),
             _buildOpcaoAdicionar(
-              icon: Icons.account_balance,
-              titulo: 'Conta',
-              subtitulo: 'Adicionar uma nova conta bancária',
+              icon: Icons.swap_horiz,
+              titulo: 'Receita',
+              subtitulo: 'Registrar receita de uma conta',
               onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Em desenvolvimento')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ReceitaFormPage(),
+                  ),
                 );
               },
             ),
-            _buildOpcaoAdicionar(
-              icon: Icons.credit_card,
-              titulo: 'Cartão de Crédito',
-              subtitulo: 'Adicionar um novo cartão',
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Em desenvolvimento')),
-                );
-              },
-            ),
-            _buildOpcaoAdicionar(
-              icon: Icons.flag,
-              titulo: 'Meta Financeira',
-              subtitulo: 'Criar uma nova meta',
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Em desenvolvimento')),
-                );
-              },
-            ),
+            const SizedBox(height: 20),
             _buildOpcaoAdicionar(
               icon: Icons.swap_horiz,
-              titulo: 'Transação',
-              subtitulo: 'Registrar receita ou despesa',
+              titulo: 'Despesa Geral',
+              subtitulo: 'Registrar despesa geral de uma conta',
               onTap: () {
-                Navigator.pop(context);
-                setState(() => _currentIndex = 2);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DespesaGeralFormPage(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+            _buildOpcaoAdicionar(
+              icon: Icons.swap_horiz,
+              titulo: 'Despesa Cartão',
+              subtitulo: 'Registrar despesa de um cartão de crédito',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DespesaCartaoFormPage(),
+                  ),
+                );
               },
             ),
           ],

@@ -49,7 +49,7 @@ class TransacaoModel {
   final double valor;
   final DateTime data;
   final TipoTransacao tipo;
-  final bool pago;
+  final bool? pago;
 
   // Campos comuns
   final String? categoriaId;
@@ -87,13 +87,13 @@ class TransacaoModel {
     required this.valor,
     required this.data,
     required this.tipo,
-    required this.pago,
     this.categoriaId,
     this.categoriaNome,
     required this.usuarioId,
     this.usuarioNome,
     this.formaPagamento,
     this.recebida,
+    this.pago,
     this.fixa,
     this.repete,
     this.periodo,
@@ -118,7 +118,7 @@ class TransacaoModel {
       valor: (json['valor'] as num).toDouble(),
       data: DateTime.parse(json['dataRecebimento'] as String),
       tipo: TipoTransacao.receita,
-      pago: json['recebida'] as bool? ?? false,
+      recebida: json['recebida'] as bool? ?? false,
       categoriaId: json['categoriaId'] as String?,
       categoriaNome: json['categoriaNome'] as String?,
       usuarioId: json['usuarioId'] as String,
@@ -126,7 +126,6 @@ class TransacaoModel {
       formaPagamento: json['formaPagamento'] != null
           ? FormaPagamento.fromString(json['formaPagamento'] as String)
           : null,
-      recebida: json['recebida'] as bool?,
       fixa: json['fixa'] as bool?,
       repete: json['repete'] as bool?,
       periodo: json['periodo'] as int?,
@@ -208,7 +207,7 @@ class TransacaoModel {
     if (tipo == TipoTransacao.receita) {
       return recebida == true ? 'Recebida' : 'A receber';
     } else {
-      return pago ? 'Paga' : 'Pendente';
+      return pago == true ? 'Paga' : 'Pendente';
     }
   }
 

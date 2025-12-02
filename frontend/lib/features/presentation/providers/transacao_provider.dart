@@ -133,16 +133,35 @@ class TransacaoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Marca receita como recebida
-  Future<bool> marcarReceitaRecebida(String id) async {
+  Future<bool> criarReceita({
+    required String usuarioId,
+    required String contaId,
+    required String descricao,
+    required double valor,
+    required DateTime dataRecebimento,
+    String? categoriaId,
+    String? formaPagamento,
+    bool? fixa,
+    bool? repete,
+    bool? recebida,
+    int? periodo,
+  }) async {
     try {
-      final transacaoAtualizada = await _transacaoService.marcarReceitaRecebida(
-        id,
+      final novaReceita = await _transacaoService.criarReceita(
+        usuarioId: usuarioId,
+        contaId: contaId,
+        descricao: descricao,
+        valor: valor,
+        dataRecebimento: dataRecebimento,
+        categoriaId: categoriaId,
+        formaPagamento: formaPagamento,
+        fixa: fixa,
+        repete: repete,
+        recebida: recebida,
+        periodo: periodo,
       );
-      final index = _transacoes.indexWhere((t) => t.id == id);
-      if (index != -1) {
-        _transacoes[index] = transacaoAtualizada;
-      }
+      _transacoes.add(novaReceita);
+      _transacoes.sort((a, b) => b.data.compareTo(a.data));
       notifyListeners();
       return true;
     } on ApiException catch (e) {
@@ -153,13 +172,38 @@ class TransacaoProvider extends ChangeNotifier {
     }
   }
 
-  /// Marca despesa geral como paga
-  Future<bool> pagarDespesaGeral(String id) async {
+  Future<bool> atualizarReceita(
+    String id, {
+    String? descricao,
+    double? valor,
+    DateTime? dataRecebimento,
+    String? formaPagamento,
+    bool? fixa,
+    bool? repete,
+    int? periodo,
+    bool? recebida,
+    String? contaId,
+    String? categoriaId,
+  }) async {
     try {
-      final transacaoAtualizada = await _transacaoService.pagarDespesaGeral(id);
+      final receitaAtualizada = await _transacaoService.atualizarReceita(
+        id,
+        descricao: descricao,
+        valor: valor,
+        dataRecebimento: dataRecebimento,
+        formaPagamento: formaPagamento,
+        fixa: fixa,
+        repete: repete,
+        recebida: recebida,
+        periodo: periodo,
+        contaId: contaId,
+        categoriaId: categoriaId,
+      );
+
       final index = _transacoes.indexWhere((t) => t.id == id);
       if (index != -1) {
-        _transacoes[index] = transacaoAtualizada;
+        _transacoes[index] = receitaAtualizada;
+        _transacoes.sort((a, b) => b.data.compareTo(a.data));
       }
       notifyListeners();
       return true;
@@ -171,6 +215,90 @@ class TransacaoProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> criarDespesaGeral({
+    required String usuarioId,
+    required String categoriaId,
+    required String descricao,
+    required double valor,
+    required DateTime dataVencimento,
+    String? contaId,
+    String? formaPagamento,
+    DateTime? lembrete,
+    bool? pago,
+    bool? repetir,
+    int? periodo,
+  }) async {
+    try {
+      final novaDespesa = await _transacaoService.criarDespesaGeral(
+        usuarioId: usuarioId,
+        categoriaId: categoriaId,
+        descricao: descricao,
+        valor: valor,
+        dataVencimento: dataVencimento,
+        contaId: contaId,
+        formaPagamento: formaPagamento,
+        lembrete: lembrete,
+        pago: pago,
+        repetir: repetir,
+        periodo: periodo,
+      );
+
+      _transacoes.add(novaDespesa);
+      _transacoes.sort((a, b) => b.data.compareTo(a.data));
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
+Future<bool> atualizarDespesaGeral(
+  String id, {
+  String? descricao,
+  double? valor,
+  DateTime? dataVencimento,
+  String? categoriaId,
+  String? contaId,
+  String? formaPagamento,
+  DateTime? lembrete,
+  bool? pago,
+  bool? repetir,
+  int? periodo,
+}) async {
+  try {
+    final despesaAtualizada = await _transacaoService.atualizarDespesaGeral(
+      id,
+      descricao: descricao,
+      valor: valor,
+      dataVencimento: dataVencimento,
+      categoriaId: categoriaId,
+      contaId: contaId,
+      formaPagamento: formaPagamento,
+      lembrete: lembrete,
+      pago: pago,
+      repetir: repetir,
+      periodo: periodo,
+    );
+
+    final index = _transacoes.indexWhere((t) => t.id == id);
+    if (index != -1) {
+      _transacoes[index] = despesaAtualizada;
+      _transacoes.sort((a, b) => b.data.compareTo(a.data));
+    }
+
+    notifyListeners();
+    return true;
+  } on ApiException catch (e) {
+    _errorMessage = e.message;
+    _isAuthError = e.isAuthError;
+    notifyListeners();
+    return false;
+  }
+}
+  
   /// Deleta uma transação
   Future<bool> deletarTransacao(String id, TipoTransacao tipo) async {
     try {

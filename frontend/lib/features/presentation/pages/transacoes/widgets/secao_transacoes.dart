@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/models/transacao_model.dart';
+import 'package:frontend/features/presentation/pages/despesa/despesa_geral_form_page.dart';
+import 'package:frontend/features/presentation/pages/receitas/receita_form_page.dart';
 
 class SecaoTransacoes extends StatelessWidget {
   final String titulo;
@@ -138,9 +140,36 @@ class TransacaoTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // TODO: Editar transação
+                  onPressed: () async {
+                    Navigator.pop(context); // Fecha o bottom sheet primeiro
+
+                    // Determina a página de destino baseada no tipo
+                    Widget destinoEdicao;
+
+                    switch (transacao.tipo) {
+                      case TipoTransacao.receita:
+                        destinoEdicao = ReceitaFormPage(receita: transacao);
+                        break;
+                      case TipoTransacao.despesaGeral:
+                        destinoEdicao = DespesaGeralFormPage(
+                          despesa: transacao,
+                        );
+                        break;
+                      case TipoTransacao.despesaCartao:
+                        destinoEdicao = DespesaGeralFormPage(
+                          despesa: transacao,
+                        );
+                        break;
+                    }
+
+                    final resultado = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => destinoEdicao),
+                    );
+
+                    if (resultado == true) {
+                      // Opcional: Mostrar mensagem de sucesso ou atualizar lista
+                    }
                   },
                   icon: const Icon(Icons.edit),
                   label: const Text('Editar'),

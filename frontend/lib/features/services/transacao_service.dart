@@ -67,6 +67,7 @@ class TransacaoService {
     String? formaPagamento,
     bool? fixa,
     bool? repete,
+    bool? recebida,
     int? periodo,
   }) async {
     return _apiClient.post(ApiConstants.receitas, {
@@ -80,17 +81,46 @@ class TransacaoService {
       if (fixa != null) 'fixa': fixa,
       if (repete != null) 'repete': repete,
       if (periodo != null) 'periodo': periodo,
+      if (recebida != null) 'recebida': recebida,
     }, (json) => TransacaoModel.fromReceita(json));
   }
 
-  Future<TransacaoModel> marcarReceitaRecebida(String id) async {
-    return _apiClient.patch(
-      ApiConstants.marcarReceitaRecebida(id),
-      {},
+  Future<TransacaoModel> atualizarReceita(
+    String id, {
+    String? descricao,
+    double? valor,
+    DateTime? dataRecebimento,
+    String? formaPagamento,
+    bool? fixa,
+    bool? repete,
+    int? periodo,
+    bool? recebida,
+    String? contaId,
+    String? categoriaId,
+  }) async {
+    final dados = <String, dynamic>{};
+
+    if (descricao != null) dados['descricao'] = descricao;
+    if (valor != null) dados['valor'] = valor;
+    if (dataRecebimento != null) {
+      dados['dataRecebimento'] = dataRecebimento.toIso8601String().split(
+        'T',
+      )[0];
+    }
+    if (formaPagamento != null) dados['formaPagamento'] = formaPagamento;
+    if (fixa != null) dados['fixa'] = fixa;
+    if (repete != null) dados['repete'] = repete;
+    if (periodo != null) dados['periodo'] = periodo;
+    if (recebida != null) dados['recebida'] = recebida;
+    if (contaId != null) dados['contaId'] = contaId;
+    if (categoriaId != null) dados['categoriaId'] = categoriaId;
+
+    return _apiClient.put(
+      ApiConstants.receitaPorId(id),
+      dados,
       (json) => TransacaoModel.fromReceita(json),
     );
   }
-
   // === DESPESAS GERAIS ===
 
   Future<List<TransacaoModel>> _buscarDespesasGerais(String usuarioId) async {
@@ -111,9 +141,11 @@ class TransacaoService {
     required String categoriaId,
     required String descricao,
     required double valor,
-    required DateTime dataDespesa,
+    required DateTime dataVencimento,
     String? contaId,
+    String? formaPagamento,
     DateTime? lembrete,
+    bool? pago,
     bool? repetir,
     int? periodo,
   }) async {
@@ -122,21 +154,15 @@ class TransacaoService {
       'categoriaId': categoriaId,
       'descricao': descricao,
       'valor': valor,
-      'dataDespesa': dataDespesa.toIso8601String().split('T')[0],
+      'dataVencimento': dataVencimento.toIso8601String().split('T')[0],
       if (contaId != null) 'contaId': contaId,
+      if (formaPagamento != null) 'formaPagamento': formaPagamento,
       if (lembrete != null)
         'lembrete': lembrete.toIso8601String().split('T')[0],
+      if (pago != null) 'pago': pago,
       if (repetir != null) 'repetir': repetir,
       if (periodo != null) 'periodo': periodo,
     }, (json) => TransacaoModel.fromDespesaGeral(json));
-  }
-
-  Future<TransacaoModel> pagarDespesaGeral(String id) async {
-    return _apiClient.patch(
-      ApiConstants.pagarDespesaGeral(id),
-      {},
-      (json) => TransacaoModel.fromDespesaGeral(json),
-    );
   }
 
   // === DESPESAS DE CARTÃO ===
@@ -160,7 +186,7 @@ class TransacaoService {
     required String categoriaId,
     required String descricao,
     required double valor,
-    required DateTime dataDespesa,
+    required DateTime dataVencimento,
     String? faturaId,
     DateTime? lembrete,
     bool? fixa,
@@ -175,7 +201,7 @@ class TransacaoService {
         'categoriaId': categoriaId,
         'descricao': descricao,
         'valor': valor,
-        'dataDespesa': dataDespesa.toIso8601String().split('T')[0],
+        'dataVencimento': dataVencimento.toIso8601String().split('T')[0],
         if (faturaId != null) 'faturaId': faturaId,
         if (lembrete != null)
           'lembrete': lembrete.toIso8601String().split('T')[0],
@@ -185,6 +211,42 @@ class TransacaoService {
         if (juros != null) 'juros': juros,
       },
       (json) => TransacaoModel.fromDespesaCartao(json),
+    );
+  }
+
+  Future<TransacaoModel> atualizarDespesaGeral(
+    String id, {
+    String? descricao,
+    double? valor,
+    DateTime? dataVencimento,
+    DateTime? lembrete,
+    bool? pago,
+    String? categoriaId,
+    String? contaId,
+    String? formaPagamento,
+    int? periodo,
+    bool? repetir,
+  }) async {
+    final dados = <String, dynamic>{};
+    if (descricao != null) dados['descricao'] = descricao;
+    if (valor != null) dados['valor'] = valor;
+    if (dataVencimento != null) {
+      dados['dataVencimento'] = dataVencimento.toIso8601String().split('T')[0];
+    }
+    if (lembrete != null) {
+      dados['lembrete'] = lembrete.toIso8601String().split('T')[0];
+    }
+    if (pago != null) dados['pago'] = pago;
+    if (categoriaId != null) dados['categoriaId'] = categoriaId;
+    if (contaId != null) dados['contaId'] = contaId;
+    if (formaPagamento != null) dados['formaPagamento'] = formaPagamento;
+    if (periodo != null) dados['periodo'] = periodo;
+    if (repetir != null) dados['repetir'] = repetir;
+
+    return _apiClient.put(
+      ApiConstants.despesaGeralPorId(id),
+      dados,
+      (json) => TransacaoModel.fromDespesaGeral(json),
     );
   }
 
