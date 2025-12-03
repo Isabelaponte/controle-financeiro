@@ -100,6 +100,7 @@ class ApiConstants {
       '/despesas-cartao/cartao/$cartaoId';
   static String despesasCartaoPorFatura(String faturaId) =>
       '/despesas-cartao/fatura/$faturaId';
+  static String atualizarDespesaCartao(String id) => 'despesas-cartao/$id';
 
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',

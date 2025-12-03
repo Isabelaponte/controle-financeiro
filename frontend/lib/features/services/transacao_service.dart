@@ -165,55 +165,6 @@ class TransacaoService {
     }, (json) => TransacaoModel.fromDespesaGeral(json));
   }
 
-  // === DESPESAS DE CARTÃO ===
-
-  Future<List<TransacaoModel>> _buscarDespesasCartao(String usuarioId) async {
-    try {
-      return await _apiClient.get(
-        ApiConstants.despesasCartaoPorUsuario(usuarioId),
-        (json) => (json as List)
-            .map((e) => TransacaoModel.fromDespesaCartao(e))
-            .toList(),
-      );
-    } catch (e) {
-      return [];
-    }
-  }
-
-  Future<TransacaoModel> criarDespesaCartao({
-    required String usuarioId,
-    required String cartaoId,
-    required String categoriaId,
-    required String descricao,
-    required double valor,
-    required DateTime dataVencimento,
-    String? faturaId,
-    DateTime? lembrete,
-    bool? fixa,
-    int? quantidadeParcelas,
-    double? juros,
-  }) async {
-    return _apiClient.post(
-      ApiConstants.despesasCartao,
-      {
-        'usuarioId': usuarioId,
-        'cartaoId': cartaoId,
-        'categoriaId': categoriaId,
-        'descricao': descricao,
-        'valor': valor,
-        'dataVencimento': dataVencimento.toIso8601String().split('T')[0],
-        if (faturaId != null) 'faturaId': faturaId,
-        if (lembrete != null)
-          'lembrete': lembrete.toIso8601String().split('T')[0],
-        if (fixa != null) 'fixa': fixa,
-        if (quantidadeParcelas != null)
-          'quantidadeParcelas': quantidadeParcelas,
-        if (juros != null) 'juros': juros,
-      },
-      (json) => TransacaoModel.fromDespesaCartao(json),
-    );
-  }
-
   Future<TransacaoModel> atualizarDespesaGeral(
     String id, {
     String? descricao,
@@ -247,6 +198,89 @@ class TransacaoService {
       ApiConstants.despesaGeralPorId(id),
       dados,
       (json) => TransacaoModel.fromDespesaGeral(json),
+    );
+  }
+
+  // === DESPESAS DE CARTÃO ===
+
+  Future<List<TransacaoModel>> _buscarDespesasCartao(String usuarioId) async {
+    try {
+      return await _apiClient.get(
+        ApiConstants.despesasCartaoPorUsuario(usuarioId),
+        (json) => (json as List)
+            .map((e) => TransacaoModel.fromDespesaCartao(e))
+            .toList(),
+      );
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<TransacaoModel> criarDespesaCartao({
+    required String usuarioId,
+    required String cartaoId,
+    required String categoriaId,
+    required String descricao,
+    required double valor,
+    String? faturaId,
+    DateTime? lembrete,
+    bool? fixa,
+    int? quantidadeParcelas,
+    double? juros,
+  }) async {
+    return _apiClient.post(
+      ApiConstants.despesasCartao,
+      {
+        'usuarioId': usuarioId,
+        'cartaoId': cartaoId,
+        'categoriaId': categoriaId,
+        'descricao': descricao,
+        'valor': valor,
+        if (faturaId != null) 'faturaId': faturaId,
+        if (lembrete != null)
+          'lembrete': lembrete.toIso8601String().split('T')[0],
+        if (fixa != null) 'fixa': fixa,
+        if (quantidadeParcelas != null)
+          'quantidadeParcelas': quantidadeParcelas,
+        if (juros != null) 'juros': juros,
+      },
+      (json) => TransacaoModel.fromDespesaCartao(json),
+    );
+  }
+
+  Future<TransacaoModel> atualizarDespesaCartao(
+    String id, {
+    String? descricao,
+    double? valor,
+    DateTime? dataDespesa,
+    DateTime? lembrete,
+    bool? pago,
+    String? categoriaId,
+    String? cartaoId,
+    String? faturaId,
+    bool? fixa,
+    int? quantidadeParcelas,
+    double? juros,
+  }) async {
+    return _apiClient.put(
+      ApiConstants.despesaCartaoPorId(id),
+      {
+        if (descricao != null) 'descricao': descricao,
+        if (valor != null) 'valor': valor,
+        if (dataDespesa != null)
+          'dataDespesa': dataDespesa.toIso8601String().split('T')[0],
+        if (lembrete != null)
+          'lembrete': lembrete.toIso8601String().split('T')[0],
+        if (pago != null) 'pago': pago,
+        if (categoriaId != null) 'categoriaId': categoriaId,
+        if (cartaoId != null) 'cartaoId': cartaoId,
+        if (faturaId != null) 'faturaId': faturaId,
+        if (fixa != null) 'fixa': fixa,
+        if (quantidadeParcelas != null)
+          'quantidadeParcelas': quantidadeParcelas,
+        if (juros != null) 'juros': juros,
+      },
+      (json) => TransacaoModel.fromDespesaCartao(json),
     );
   }
 

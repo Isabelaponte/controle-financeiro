@@ -255,50 +255,133 @@ class TransacaoProvider extends ChangeNotifier {
     }
   }
 
-Future<bool> atualizarDespesaGeral(
-  String id, {
-  String? descricao,
-  double? valor,
-  DateTime? dataVencimento,
-  String? categoriaId,
-  String? contaId,
-  String? formaPagamento,
-  DateTime? lembrete,
-  bool? pago,
-  bool? repetir,
-  int? periodo,
-}) async {
-  try {
-    final despesaAtualizada = await _transacaoService.atualizarDespesaGeral(
-      id,
-      descricao: descricao,
-      valor: valor,
-      dataVencimento: dataVencimento,
-      categoriaId: categoriaId,
-      contaId: contaId,
-      formaPagamento: formaPagamento,
-      lembrete: lembrete,
-      pago: pago,
-      repetir: repetir,
-      periodo: periodo,
-    );
+  Future<bool> atualizarDespesaGeral(
+    String id, {
+    String? descricao,
+    double? valor,
+    DateTime? dataVencimento,
+    String? categoriaId,
+    String? contaId,
+    String? formaPagamento,
+    DateTime? lembrete,
+    bool? pago,
+    bool? repetir,
+    int? periodo,
+  }) async {
+    try {
+      final despesaAtualizada = await _transacaoService.atualizarDespesaGeral(
+        id,
+        descricao: descricao,
+        valor: valor,
+        dataVencimento: dataVencimento,
+        categoriaId: categoriaId,
+        contaId: contaId,
+        formaPagamento: formaPagamento,
+        lembrete: lembrete,
+        pago: pago,
+        repetir: repetir,
+        periodo: periodo,
+      );
 
-    final index = _transacoes.indexWhere((t) => t.id == id);
-    if (index != -1) {
-      _transacoes[index] = despesaAtualizada;
-      _transacoes.sort((a, b) => b.data.compareTo(a.data));
+      final index = _transacoes.indexWhere((t) => t.id == id);
+      if (index != -1) {
+        _transacoes[index] = despesaAtualizada;
+        _transacoes.sort((a, b) => b.data.compareTo(a.data));
+      }
+
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
     }
-
-    notifyListeners();
-    return true;
-  } on ApiException catch (e) {
-    _errorMessage = e.message;
-    _isAuthError = e.isAuthError;
-    notifyListeners();
-    return false;
   }
-}
-  
+
+  Future<bool> criarDespesaCartao({
+    required String usuarioId,
+    required String categoriaId,
+    required String cartaoId,
+    required String descricao,
+    required double valor,
+    String? faturaId,
+    DateTime? lembrete,
+    bool? fixa,
+    int? quantidadeParcelas,
+    double? juros,
+  }) async {
+    try {
+      final novaDespesa = await _transacaoService.criarDespesaCartao(
+        usuarioId: usuarioId,
+        categoriaId: categoriaId,
+        cartaoId: cartaoId,
+        descricao: descricao,
+        valor: valor,
+        faturaId: faturaId,
+        lembrete: lembrete,
+        fixa: fixa,
+        quantidadeParcelas: quantidadeParcelas,
+        juros: juros,
+      );
+
+      _transacoes.add(novaDespesa);
+      _transacoes.sort((a, b) => b.data.compareTo(a.data));
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> atualizarDespesaCartao(
+    String id, {
+    String? descricao,
+    double? valor,
+    DateTime? dataDespesa,
+    DateTime? lembrete,
+    bool? pago,
+    String? categoriaId,
+    String? cartaoId,
+    String? faturaId,
+    bool? fixa,
+    int? quantidadeParcelas,
+    double? juros,
+  }) async {
+    try {
+      final despesaAtualizada = await _transacaoService.atualizarDespesaCartao(
+        id,
+        descricao: descricao,
+        valor: valor,
+        dataDespesa: dataDespesa,
+        lembrete: lembrete,
+        pago: pago,
+        categoriaId: categoriaId,
+        cartaoId: cartaoId,
+        faturaId: faturaId,
+        fixa: fixa,
+        quantidadeParcelas: quantidadeParcelas,
+        juros: juros,
+      );
+
+      final index = _transacoes.indexWhere((t) => t.id == id);
+      if (index != -1) {
+        _transacoes[index] = despesaAtualizada;
+        _transacoes.sort((a, b) => b.data.compareTo(a.data));
+        notifyListeners();
+      }
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Deleta uma transação
   Future<bool> deletarTransacao(String id, TipoTransacao tipo) async {
     try {

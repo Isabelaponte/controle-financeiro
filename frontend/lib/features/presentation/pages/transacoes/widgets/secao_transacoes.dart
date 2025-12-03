@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/models/transacao_model.dart';
+import 'package:frontend/features/presentation/pages/despesa/despesa_cartao_form_page.dart';
 import 'package:frontend/features/presentation/pages/despesa/despesa_geral_form_page.dart';
 import 'package:frontend/features/presentation/pages/receitas/receita_form_page.dart';
 
@@ -141,9 +142,8 @@ class TransacaoTile extends StatelessWidget {
               children: [
                 TextButton.icon(
                   onPressed: () async {
-                    Navigator.pop(context); // Fecha o bottom sheet primeiro
+                    Navigator.pop(context); 
 
-                    // Determina a página de destino baseada no tipo
                     Widget destinoEdicao;
 
                     switch (transacao.tipo) {
@@ -156,7 +156,7 @@ class TransacaoTile extends StatelessWidget {
                         );
                         break;
                       case TipoTransacao.despesaCartao:
-                        destinoEdicao = DespesaGeralFormPage(
+                        destinoEdicao = DespesaCartaoFormPage(
                           despesa: transacao,
                         );
                         break;

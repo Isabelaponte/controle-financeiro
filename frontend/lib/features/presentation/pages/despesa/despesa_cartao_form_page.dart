@@ -3,38 +3,39 @@ import 'package:flutter/services.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/models/transacao_model.dart';
 import 'package:frontend/features/presentation/providers/auth_provider.dart';
+import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/transacao_provider.dart';
 import 'package:frontend/features/presentation/providers/categoria_provider.dart';
-import 'package:frontend/features/presentation/providers/conta_provider.dart';
+import 'package:frontend/features/presentation/providers/fatura_provider.dart';
 import 'package:frontend/features/shared/widgets/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ReceitaFormPage extends StatefulWidget {
-  final TransacaoModel? receita;
+class DespesaCartaoFormPage extends StatefulWidget {
+  final TransacaoModel? despesa;
 
-  const ReceitaFormPage({super.key, this.receita});
+  const DespesaCartaoFormPage({super.key, this.despesa});
 
   @override
-  State<ReceitaFormPage> createState() => _ReceitaFormPageState();
+  State<DespesaCartaoFormPage> createState() => _DespesaCartaoFormPageState();
 }
 
-class _ReceitaFormPageState extends State<ReceitaFormPage> {
+class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _descricaoController = TextEditingController();
   final _valorController = TextEditingController();
-  final _periodoController = TextEditingController();
+  final _parcelasController = TextEditingController();
 
-  DateTime _dataRecebimento = DateTime.now();
-  FormaPagamento _formaPagamento = FormaPagamento.pix;
+  DateTime _data = DateTime.now();
   bool _fixa = false;
-  bool _repete = false;
-  bool? _recebida = false;
-  String? _contaId;
+  bool _parcelado = false;
+  int _numeroParcelas = 1;
+  String? _cartaoId;
+  String? _faturaId;
   String? _categoriaId;
   bool _isLoading = false;
 
-  bool get isEdicao => widget.receita != null;
+  bool get isEdicao => widget.despesa != null;
 
   @override
   void initState() {
@@ -51,44 +52,54 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
 
     if (user != null) {
       context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
-      context.read<ContaProvider>().carregarContas(user.id);
+      context.read<CartaoCreditoProvider>().carregarCartoes(user.id);
     }
   }
 
   void _preencherCampos() {
-    final receita = widget.receita!;
-    _descricaoController.text = receita.descricao;
-    _valorController.text = receita.valor.toStringAsFixed(2);
-    _dataRecebimento = receita.data;
-    _formaPagamento = receita.formaPagamento ?? FormaPagamento.pix;
-    _fixa = receita.fixa ?? false;
-    _repete = receita.repete ?? false;
-    _recebida = receita.recebida;
-    _periodoController.text = receita.periodo?.toString() ?? '';
-    _contaId = receita.contaId;
-    _categoriaId = receita.categoriaId;
+    final despesa = widget.despesa!;
+    _descricaoController.text = despesa.descricao;
+    _valorController.text = despesa.valor.toStringAsFixed(2);
+    _data = despesa.data;
+    _fixa = despesa.fixa ?? false;
+    _cartaoId = despesa.cartaoId;
+    _categoriaId = despesa.categoriaId;
+    _faturaId = despesa.faturaId;
+
+    if (_cartaoId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<FaturaProvider>().carregarFaturas(_cartaoId!);
+      });
+    }
   }
 
   @override
   void dispose() {
     _descricaoController.dispose();
     _valorController.dispose();
-    _periodoController.dispose();
+    _parcelasController.dispose();
     super.dispose();
   }
 
   Future<void> _selecionarData() async {
     final data = await showDatePicker(
       context: context,
-      initialDate: _dataRecebimento,
+      initialDate: _data,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       locale: const Locale('pt', 'BR'),
     );
 
     if (data != null) {
-      setState(() => _dataRecebimento = data);
+      setState(() => _data = data);
     }
+  }
+
+  double get _valorParcela {
+    if (!_parcelado || _numeroParcelas <= 0) return 0;
+    final valor =
+        double.tryParse(_valorController.text.replaceAll(',', '.')) ?? 0;
+    return valor / _numeroParcelas;
   }
 
   @override
@@ -96,7 +107,7 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isEdicao ? 'Editar Receita' : 'Nova Receita',
+          isEdicao ? 'Editar Despesa de Cartão' : 'Nova Despesa de Cartão',
           style: const TextStyle(fontSize: 16),
         ),
         backgroundColor: AppColors.purpleLight,
@@ -110,106 +121,106 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Column(
-                children: [
-                  TextFormField(
-                    controller: _valorController,
-                    decoration: InputDecoration(
-                      labelText: 'Valor *',
-                      hintText: '0,00',
-                      prefixText: 'R\$ ',
-                      labelStyle: TextStyle(color: AppColors.purpleDark),
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\,?\d{0,2}'),
-                      ),
-                    ],
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Valor é obrigatório';
-                      }
-                      final numero = double.tryParse(
-                        value.replaceAll(',', '.'),
-                      );
-                      if (numero == null || numero <= 0) {
-                        return 'Valor deve ser positivo';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+              // Valor
+              TextFormField(
+                controller: _valorController,
+                decoration: InputDecoration(
+                  labelText: 'Valor Total *',
+                  hintText: '0,00',
+                  prefixText: 'R\$ ',
+                  labelStyle: TextStyle(color: AppColors.purpleDark),
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\,?\d{0,2}')),
                 ],
+                onChanged: (_) =>
+                    setState(() {}),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Valor é obrigatório';
+                  }
+                  final numero = double.tryParse(value.replaceAll(',', '.'));
+                  if (numero == null || numero <= 0) {
+                    return 'Valor deve ser positivo';
+                  }
+                  return null;
+                },
               ),
-              // Data de Recebimento
+              const SizedBox(height: 16),
+
+              // Descrição
+              TextFormField(
+                controller: _descricaoController,
+                decoration: InputDecoration(
+                  labelText: 'Descrição *',
+                  hintText: 'Ex: Compra no supermercado...',
+                  labelStyle: TextStyle(color: AppColors.purpleDark),
+                  border: const OutlineInputBorder(),
+                ),
+                maxLength: 200,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Descrição é obrigatória';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Data
               InkWell(
                 onTap: _selecionarData,
                 child: InputDecorator(
                   decoration: InputDecoration(
-                    labelText: 'Data de Recebimento *',
+                    labelText: 'Data da Compra *',
                     labelStyle: TextStyle(color: AppColors.purpleDark),
                     border: const OutlineInputBorder(),
                   ),
                   child: Text(
-                    DateFormat('dd/MM/yyyy').format(_dataRecebimento),
+                    DateFormat('dd/MM/yyyy').format(_data),
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
 
-              // Forma de Pagamento
-              DropdownButtonFormField<FormaPagamento>(
-                initialValue: _formaPagamento,
-                decoration: InputDecoration(
-                  labelText: 'Forma de Pagamento *',
-                  labelStyle: TextStyle(color: AppColors.purpleDark),
-                  border: const OutlineInputBorder(),
-                ),
-                items: FormaPagamento.values.map((forma) {
-                  return DropdownMenuItem(
-                    value: forma,
-                    child: Text(_nomeFormaPagamento(forma)),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _formaPagamento = value);
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Conta
-              Consumer<ContaProvider>(
-                builder: (context, contaProvider, child) {
-                  if (contaProvider.isLoading) {
+              Consumer<CartaoCreditoProvider>(
+                builder: (context, cartaoProvider, child) {
+                  if (cartaoProvider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final contas = contaProvider.contasAtivas;
+                  final cartoes = cartaoProvider.cartoesAtivos;
 
                   return DropdownButtonFormField<String>(
-                    initialValue: _contaId,
+                    value: _cartaoId,
                     decoration: InputDecoration(
-                      labelText: 'Conta *',
+                      labelText: 'Cartão de Crédito *',
                       labelStyle: TextStyle(color: AppColors.purpleDark),
                       border: const OutlineInputBorder(),
                     ),
-                    hint: const Text('Selecione uma conta'),
-                    items: contas.map((conta) {
+                    hint: const Text('Selecione um cartão'),
+                    items: cartoes.map((cartao) {
                       return DropdownMenuItem(
-                        value: conta.id,
-                        child: Text(conta.nome),
+                        value: cartao.id,
+                        child: Text(cartao.nome),
                       );
                     }).toList(),
-                    onChanged: (value) => setState(() => _contaId = value),
+                    onChanged: (value) {
+                      setState(() {
+                        _cartaoId = value;
+                        _faturaId = null;
+                      });
+                      if (value != null) {
+                        context.read<FaturaProvider>().carregarFaturas(value);
+                      }
+                    },
                     validator: (value) {
-                      if (value == null) return 'Selecione uma conta';
+                      if (value == null) return 'Selecione um cartão';
                       return null;
                     },
                   );
@@ -217,7 +228,50 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
               ),
               const SizedBox(height: 16),
 
-              // Categoria (Opcional)
+              Consumer<FaturaProvider>(
+                builder: (context, faturaProvider, child) {
+                  if (faturaProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final faturas = faturaProvider.faturas;
+
+                  return DropdownButtonFormField<String>(
+                    value: _faturaId,
+                    decoration: InputDecoration(
+                      labelText: 'Fatura *',
+                      labelStyle: TextStyle(color: AppColors.purpleDark),
+                      border: const OutlineInputBorder(),
+                    ),
+                    hint: const Text('Selecione uma fatura'),
+                    items: faturas.map((fatura) {
+                      final dataFormatada =
+                          '${fatura.dataVencimento.day.toString().padLeft(2, '0')}/'
+                          '${fatura.dataVencimento.month.toString().padLeft(2, '0')}/'
+                          '${fatura.dataVencimento.year}';
+
+                      final texto = 'Venc: $dataFormatada';
+
+                      return DropdownMenuItem(
+                        value: fatura.id,
+                        child: Text(
+                          texto,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => _faturaId = value),
+                    validator: (value) {
+                      if (value == null) return 'Selecione uma fatura';
+                      return null;
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Categoria
               Consumer<CategoriaProvider>(
                 builder: (context, categoriaProvider, child) {
                   if (categoriaProvider.isLoading) {
@@ -227,9 +281,9 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
                   final categorias = categoriaProvider.categoriasAtivas;
 
                   return DropdownButtonFormField<String>(
-                    initialValue: _categoriaId,
+                    value: _categoriaId,
                     decoration: InputDecoration(
-                      labelText: 'Categoria (Opcional)',
+                      labelText: 'Categoria *',
                       labelStyle: TextStyle(color: AppColors.purpleDark),
                       border: const OutlineInputBorder(),
                     ),
@@ -261,29 +315,16 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
                       );
                     }).toList(),
                     onChanged: (value) => setState(() => _categoriaId = value),
+                    validator: (value) {
+                      if (value == null) return 'Selecione uma categoria';
+                      return null;
+                    },
                   );
                 },
               ),
               const SizedBox(height: 24),
 
-              TextFormField(
-                controller: _descricaoController,
-                decoration: InputDecoration(
-                  labelText: 'Descrição *',
-                  hintText: 'Ex: Salário, Freelance...',
-                  labelStyle: TextStyle(color: AppColors.purpleDark),
-                  border: const OutlineInputBorder(),
-                ),
-                maxLength: 200,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Descrição é obrigatória';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
+              // Opções
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -300,62 +341,71 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Receita Fixa
+                      // Despesa Fixa
                       SwitchListTile(
                         value: _fixa,
                         onChanged: (value) => setState(() => _fixa = value),
-                        title: const Text('Receita Fixa'),
-                        subtitle: const Text('Receita recorrente mensalmente'),
+                        title: const Text('Despesa Fixa'),
+                        subtitle: const Text('Despesa recorrente mensalmente'),
                         activeThumbColor: AppColors.purpleDark,
                       ),
 
-                      // Repetir
+                      // Parcelado
                       SwitchListTile(
-                        value: _repete,
-                        onChanged: (value) => setState(() => _repete = value),
-                        title: const Text('Repetir'),
-                        subtitle: const Text('Repetir por um período'),
+                        value: _parcelado,
+                        onChanged: (value) {
+                          setState(() {
+                            _parcelado = value;
+                            if (!value) {
+                              _numeroParcelas = 1;
+                              _parcelasController.clear();
+                            }
+                          });
+                        },
+                        title: const Text('Parcelado'),
+                        subtitle: const Text('Dividir em parcelas'),
                         activeThumbColor: AppColors.purpleDark,
                       ),
 
-                      // Período (se repetir estiver ativo)
-                      if (_repete) ...[
+                      // Número de Parcelas
+                      if (_parcelado) ...[
                         const SizedBox(height: 12),
                         TextFormField(
-                          controller: _periodoController,
+                          controller: _parcelasController,
                           decoration: InputDecoration(
-                            labelText: 'Período (meses)',
+                            labelText: 'Número de Parcelas *',
                             hintText: 'Ex: 12',
                             labelStyle: TextStyle(color: AppColors.purpleDark),
                             border: const OutlineInputBorder(),
+                            helperText: _numeroParcelas > 0 && _valorParcela > 0
+                                ? '${_numeroParcelas}x de R\$ ${_valorParcela.toStringAsFixed(2)}'
+                                : null,
                           ),
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
+                          onChanged: (value) {
+                            setState(() {
+                              _numeroParcelas = int.tryParse(value) ?? 1;
+                            });
+                          },
                           validator: (value) {
-                            if (_repete) {
+                            if (_parcelado) {
                               if (value == null || value.isEmpty) {
-                                return 'Informe o período';
+                                return 'Informe o número de parcelas';
                               }
-                              final periodo = int.tryParse(value);
-                              if (periodo == null ||
-                                  periodo < 1 ||
-                                  periodo > 120) {
-                                return 'Período deve ser entre 1 e 120 meses';
+                              final parcelas = int.tryParse(value);
+                              if (parcelas == null ||
+                                  parcelas < 2 ||
+                                  parcelas > 48) {
+                                return 'Parcelas deve ser entre 2 e 48';
                               }
                             }
                             return null;
                           },
                         ),
                       ],
-                      SwitchListTile(
-                        value: _recebida ?? false,
-                        onChanged: (value) => setState(() => _recebida = value),
-                        title: const Text('Recebido?'),
-                        subtitle: const Text('Marcar a receita como recebida'),
-                        activeThumbColor: AppColors.purpleDark,
-                      ),
                     ],
                   ),
                 ),
@@ -424,15 +474,18 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
   Future<void> _salvar() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (_contaId == null) {
-      _mostrarErro('Selecione uma conta');
+    if (_cartaoId == null) {
+      _mostrarErro('Selecione um cartão');
       return;
     }
 
-    if (_repete &&
-        (_periodoController.text.isEmpty ||
-            int.parse(_periodoController.text) < 1)) {
-      _mostrarErro('Informe o período de repetição');
+    if (_categoriaId == null) {
+      _mostrarErro('Selecione uma categoria');
+      return;
+    }
+
+    if (_parcelado && _numeroParcelas < 2) {
+      _mostrarErro('Número de parcelas deve ser maior que 1');
       return;
     }
 
@@ -451,32 +504,29 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
       bool sucesso;
 
       if (isEdicao) {
-        sucesso = await transacaoProvider.atualizarReceita(
-          widget.receita!.id,
+        sucesso = await transacaoProvider.atualizarDespesaCartao(
+          widget.despesa!.id,
+          categoriaId: _categoriaId!,
+          cartaoId: _cartaoId!,
           descricao: _descricaoController.text.trim(),
           valor: double.parse(_valorController.text.replaceAll(',', '.')),
-          dataRecebimento: _dataRecebimento,
-          formaPagamento: _formaPagamento.name.toUpperCase(),
+          dataDespesa: _data,
+          faturaId: _faturaId,
           fixa: _fixa,
-          recebida: _recebida,
-          repete: _repete,
-          periodo: _repete ? int.parse(_periodoController.text) : null,
-          contaId: _contaId,
-          categoriaId: _categoriaId,
+          quantidadeParcelas: _parcelado ? _numeroParcelas : 1,
+          juros: 0.0,
         );
       } else {
-        sucesso = await transacaoProvider.criarReceita(
+        sucesso = await transacaoProvider.criarDespesaCartao(
           usuarioId: user.id,
-          contaId: _contaId!,
+          categoriaId: _categoriaId!,
+          cartaoId: _cartaoId!,
           descricao: _descricaoController.text.trim(),
           valor: double.parse(_valorController.text.replaceAll(',', '.')),
-          dataRecebimento: _dataRecebimento,
-          formaPagamento: _formaPagamento.name.toUpperCase(),
+          faturaId: _faturaId,
           fixa: _fixa,
-          recebida: _recebida,
-          repete: _repete,
-          periodo: _repete ? int.parse(_periodoController.text) : null,
-          categoriaId: _categoriaId,
+          quantidadeParcelas: _parcelado ? _numeroParcelas : 1,
+          juros: 0.0,
         );
       }
 
@@ -487,8 +537,10 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
           SnackBar(
             content: Text(
               isEdicao
-                  ? 'Receita atualizada com sucesso!'
-                  : 'Receita criada com sucesso!',
+                  ? 'Despesa atualizada com sucesso!'
+                  : _faturaId == null
+                  ? 'Despesa criada com sucesso! Fatura criada automaticamente.'
+                  : 'Despesa criada com sucesso!',
             ),
             backgroundColor: AppColors.green,
           ),
@@ -496,7 +548,7 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
         Navigator.pop(context, true);
       } else {
         _mostrarErro(
-          transacaoProvider.errorMessage ?? 'Erro ao salvar receita',
+          transacaoProvider.errorMessage ?? 'Erro ao salvar despesa',
         );
       }
     } catch (e) {
@@ -512,20 +564,5 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(mensagem), backgroundColor: AppColors.red),
     );
-  }
-
-  String _nomeFormaPagamento(FormaPagamento forma) {
-    switch (forma) {
-      case FormaPagamento.dinheiro:
-        return 'Dinheiro';
-      case FormaPagamento.pix:
-        return 'PIX';
-      case FormaPagamento.transferencia:
-        return 'Transferência';
-      case FormaPagamento.debito:
-        return 'Débito';
-      case FormaPagamento.credito:
-        return 'Crédito';
-    }
   }
 }
