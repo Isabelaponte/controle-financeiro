@@ -35,7 +35,8 @@ public class Fatura {
     @Column
     private LocalDate dataPagamento;
 
-    @Column
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatusPagamento statusPagamento;
 
     @ManyToOne

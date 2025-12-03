@@ -20,8 +20,7 @@ public class CriaDespesaCartaoDTO {
 
     private String descricao;
 
-    @NotNull(message = "Data da despesa é obrigatória")
-    private LocalDate dataDespesa;
+    private LocalDate dataDespesa = LocalDate.now();
 
     private LocalDate lembrete;
 

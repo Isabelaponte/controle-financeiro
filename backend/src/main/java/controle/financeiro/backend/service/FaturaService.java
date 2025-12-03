@@ -7,8 +7,10 @@ import controle.financeiro.backend.enums.StatusPagamento;
 import controle.financeiro.backend.exception.RecursoNaoEcontradoException;
 import controle.financeiro.backend.mapper.FaturaMapper;
 import controle.financeiro.backend.model.CartaoCredito;
+import controle.financeiro.backend.model.DespesaCartao;
 import controle.financeiro.backend.model.Fatura;
 import controle.financeiro.backend.repository.CartaoCreditoRepository;
+import controle.financeiro.backend.repository.DespesaCartaoRepository;
 import controle.financeiro.backend.repository.FaturaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class FaturaService {
 
     private final FaturaRepository faturaRepository;
     private final CartaoCreditoRepository cartaoCreditoRepository;
+    private final DespesaCartaoRepository despesaCartaoRepository;
     private final FaturaMapper faturaMapper;
 
     public FaturaResponseDTO criar(CriaFaturaDTO dto) {
@@ -43,10 +47,76 @@ public class FaturaService {
         return faturaMapper.toResponseDTO(fatura);
     }
 
-    public List<FaturaResponseDTO> listarPorCartao(String cartaoId) {
-        if (!cartaoCreditoRepository.existsById(cartaoId)) {
-            throw new RecursoNaoEcontradoException("Cartão não encontrado");
+    private void verificarEProcessarFaturasVencidas(CartaoCredito cartao) {
+        LocalDate hoje = LocalDate.now();
+
+        List<Fatura> faturasPendentes = faturaRepository.findByCartaoCreditoIdAndStatusPagamento(
+                cartao.getId(),
+                StatusPagamento.PENDENTE
+        );
+
+        for (Fatura fatura : faturasPendentes) {
+            if (fatura.getDataVencimento().isBefore(hoje)) {
+                fatura.setStatusPagamento(StatusPagamento.ATRASADO);
+                faturaRepository.save(fatura);
+            }
         }
+    }
+
+    private void criarProximaFatura(CartaoCredito cartao, Fatura faturaAnterior) {
+        LocalDate hoje = LocalDate.now();
+        int diaVencimento = cartao.getDiaVencimento();
+
+        LocalDate dataVencimento;
+
+        if (faturaAnterior != null) {
+            dataVencimento = faturaAnterior.getDataVencimento().plusMonths(1);
+        } else {
+            dataVencimento = hoje.withDayOfMonth(diaVencimento);
+            if (dataVencimento.isBefore(hoje) || dataVencimento.isEqual(hoje)) {
+                dataVencimento = dataVencimento.plusMonths(1);
+            }
+        }
+
+        Fatura novaFatura = new Fatura();
+        novaFatura.setCartaoCredito(cartao);
+        novaFatura.setDataVencimento(dataVencimento);
+        novaFatura.setValorTotal(0.0);
+        novaFatura.setStatusPagamento(StatusPagamento.PENDENTE);
+
+        faturaRepository.save(novaFatura);
+    }
+
+    private void garantirFaturaPendente(CartaoCredito cartao) {
+        LocalDate hoje = LocalDate.now();
+
+        Optional<Fatura> ultimaFatura = faturaRepository
+                .findFirstByCartaoCreditoIdOrderByDataVencimentoDesc(cartao.getId());
+
+        boolean precisaCriarNova = false;
+
+        if (ultimaFatura.isEmpty()) {
+            precisaCriarNova = true;
+        } else {
+            Fatura ultima = ultimaFatura.get();
+
+            if (ultima.getDataVencimento().isBefore(hoje) ||
+                    ultima.getDataVencimento().isEqual(hoje)) {
+                precisaCriarNova = true;
+            }
+        }
+
+        if (precisaCriarNova) {
+            criarProximaFatura(cartao, ultimaFatura.orElse(null));
+        }
+    }
+
+    public List<FaturaResponseDTO> listarPorCartao(String cartaoId) {
+        CartaoCredito cartao = cartaoCreditoRepository.findById(cartaoId)
+                .orElseThrow(() -> new RecursoNaoEcontradoException("Cartão não encontrado"));
+
+        verificarEProcessarFaturasVencidas(cartao);
+        garantirFaturaPendente(cartao);
 
         List<Fatura> faturas = faturaRepository.findByCartaoCreditoId(cartaoId);
         return faturaMapper.toResponseDTOList(faturas);
@@ -62,9 +132,11 @@ public class FaturaService {
     }
 
     public List<FaturaResponseDTO> listarPendentes(String cartaoId) {
-        if (!cartaoCreditoRepository.existsById(cartaoId)) {
-            throw new RecursoNaoEcontradoException("Cartão não encontrado");
-        }
+        CartaoCredito cartao = cartaoCreditoRepository.findById(cartaoId)
+                .orElseThrow(() -> new RecursoNaoEcontradoException("Cartão não encontrado"));
+
+        verificarEProcessarFaturasVencidas(cartao);
+        garantirFaturaPendente(cartao);
 
         List<Fatura> faturas = faturaRepository.findByCartaoCreditoIdAndStatusPagamento(
                 cartaoId, StatusPagamento.PENDENTE);
@@ -92,9 +164,17 @@ public class FaturaService {
         fatura.setStatusPagamento(StatusPagamento.PAGO);
         fatura.setDataPagamento(LocalDate.now());
 
+        List<DespesaCartao> despesas = despesaCartaoRepository.findByFaturaId(id);
+        for (DespesaCartao despesa : despesas) {
+            despesa.setPago(true);
+        }
+        despesaCartaoRepository.saveAll(despesas);
+
         Fatura paga = faturaRepository.save(fatura);
         return faturaMapper.toResponseDTO(paga);
     }
+
+
 
     public void deletar(String id) {
         if (!faturaRepository.existsById(id)) {

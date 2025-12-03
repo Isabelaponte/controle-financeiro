@@ -2,6 +2,8 @@ package controle.financeiro.backend.repository;
 
 import controle.financeiro.backend.model.DespesaCartao;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -23,4 +25,7 @@ public interface DespesaCartaoRepository extends JpaRepository<DespesaCartao, St
     List<DespesaCartao> findByCategoriaId(String categoriaId);
 
     List<DespesaCartao> findByFixa(Boolean fixa);
+
+    @Query("SELECT SUM(d.valor) FROM DespesaCartao d WHERE d.fatura.id = :faturaId")
+    Double somarValorPorFatura(@Param("faturaId") String faturaId);
 }

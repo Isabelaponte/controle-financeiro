@@ -3,19 +3,23 @@ package controle.financeiro.backend.service;
 import controle.financeiro.backend.dto.request.cartaoCredito.AtualizaCartaoCreditoDTO;
 import controle.financeiro.backend.dto.request.cartaoCredito.CriaCartaoCreditoDTO;
 import controle.financeiro.backend.dto.response.CartaoCreditoResponseDTO;
+import controle.financeiro.backend.enums.StatusPagamento;
 import controle.financeiro.backend.exception.RecursoNaoEcontradoException;
 import controle.financeiro.backend.exception.cartaoCredito.CartaoCreditoNomeJaExisteException;
 import controle.financeiro.backend.mapper.CartaoCreditoMapper;
 import controle.financeiro.backend.model.CartaoCredito;
 import controle.financeiro.backend.model.Categoria;
+import controle.financeiro.backend.model.Fatura;
 import controle.financeiro.backend.model.Usuario;
 import controle.financeiro.backend.repository.CartaoCreditoRepository;
 import controle.financeiro.backend.repository.CategoriaRepository;
+import controle.financeiro.backend.repository.FaturaRepository;
 import controle.financeiro.backend.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -26,6 +30,7 @@ public class CartaoCreditoService {
     private final CartaoCreditoRepository cartaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
+    private final FaturaRepository faturaRepository;
     private final CartaoCreditoMapper cartaoMapper;
 
     public CartaoCreditoResponseDTO criar(CriaCartaoCreditoDTO dto) {
@@ -49,7 +54,28 @@ public class CartaoCreditoService {
         CartaoCredito cartao = cartaoMapper.toEntity(dto, usuario, categoria);
         CartaoCredito salvo = cartaoRepository.save(cartao);
 
+        criarProximaFatura(salvo);
+
         return cartaoMapper.toResponseDTO(salvo);
+    }
+
+    private void criarProximaFatura(CartaoCredito cartao) {
+        LocalDate hoje = LocalDate.now();
+        int diaVencimento = cartao.getDiaVencimento();
+
+        LocalDate dataVencimento = hoje.withDayOfMonth(diaVencimento);
+
+        if (dataVencimento.isBefore(hoje) || dataVencimento.isEqual(hoje)) {
+            dataVencimento = dataVencimento.plusMonths(1);
+        }
+
+        Fatura novaFatura = new Fatura();
+        novaFatura.setCartaoCredito(cartao);
+        novaFatura.setDataVencimento(dataVencimento);
+        novaFatura.setValorTotal(0.0);
+        novaFatura.setStatusPagamento(StatusPagamento.PENDENTE);
+
+        faturaRepository.save(novaFatura);
     }
 
     public CartaoCreditoResponseDTO buscarPorId(String id) {

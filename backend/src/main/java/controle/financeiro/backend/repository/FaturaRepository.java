@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FaturaRepository extends JpaRepository<Fatura, String> {
@@ -20,6 +21,8 @@ public interface FaturaRepository extends JpaRepository<Fatura, String> {
 
     List<Fatura> findByCartaoCreditoIdAndDataVencimentoBetween(String cartaoId, LocalDate inicio, LocalDate fim);
 
+    Optional<Fatura> findFirstByCartaoCreditoIdOrderByDataVencimentoDesc(String cartaoId);
+
     @Query("SELECT f FROM Fatura f WHERE f.cartaoCredito.usuario.id = :usuarioId " +
             "AND f.dataVencimento < :hoje AND f.statusPagamento <> :status")
     List<Fatura> findVencidasPorUsuario(
@@ -27,4 +30,6 @@ public interface FaturaRepository extends JpaRepository<Fatura, String> {
             @Param("hoje") LocalDate hoje,
             @Param("status") StatusPagamento status
     );
+
+    Optional<Fatura> findByCartaoCreditoIdAndDataVencimento(String cartaoId, LocalDate dataVencimento);
 }
