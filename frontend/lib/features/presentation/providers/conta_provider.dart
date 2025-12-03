@@ -20,6 +20,7 @@ class ContaProvider extends ChangeNotifier {
   // Getters
   List<ContaModel> get contas => _contas;
   List<ContaModel> get contasAtivas => _contas.where((c) => c.ativa).toList();
+  List<ContaModel> get contasInativas => _contas.where((c) => !c.ativa).toList();
   double get saldoTotal => _saldoTotal;
   ContaStatus get status => _status;
   String? get errorMessage => _errorMessage;
@@ -30,7 +31,26 @@ class ContaProvider extends ChangeNotifier {
     return _saldoTotal.toStringAsFixed(2).replaceAll('.', ',');
   }
 
-  /// Carrega todas as contas ativas do usuário
+  Future<void> carregarTodasAsContas(String usuarioId) async {
+    _status = ContaStatus.loading;
+    _errorMessage = null;
+    _isAuthError = false;
+    notifyListeners();
+
+    try {
+      _contas = await _contaService.listarPorUsuario(usuarioId);
+      _status = ContaStatus.success;
+    } on ApiException catch (e) {
+      _status = ContaStatus.error;
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+    } catch (e) {
+      _status = ContaStatus.error;
+      _errorMessage = 'Erro inesperado ao carregar contas';
+    }
+    notifyListeners();
+  }
+
   Future<void> carregarContas(String usuarioId) async {
     _status = ContaStatus.loading;
     _errorMessage = null;
@@ -169,6 +189,19 @@ class ContaProvider extends ChangeNotifier {
       final conta = _contas.firstWhere((c) => c.id == id);
       _saldoTotal -= conta.saldo;
       _contas.removeWhere((c) => c.id == id);
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
+    Future<bool> reativarConta(String id) async {
+    try {
+      await _contaService.reativar(id);
       notifyListeners();
       return true;
     } on ApiException catch (e) {

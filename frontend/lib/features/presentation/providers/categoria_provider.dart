@@ -19,6 +19,8 @@ class CategoriaProvider extends ChangeNotifier {
   List<CategoriaModel> get categorias => _categorias;
   List<CategoriaModel> get categoriasAtivas =>
       _categorias.where((c) => c.ativo).toList();
+  List<CategoriaModel> get categoriasInativas =>
+      _categorias.where((c) => !c.ativo).toList();
   CategoriaStatus get status => _status;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _status == CategoriaStatus.loading;
@@ -118,10 +120,6 @@ class CategoriaProvider extends ChangeNotifier {
       return false;
     }
   }
-
-  // Adicione este getter após categoriasAtivas:
-  List<CategoriaModel> get categoriasInativas =>
-      _categorias.where((c) => !c.ativo).toList();
 
   Future<bool> reativarCategoria(String id) async {
     try {

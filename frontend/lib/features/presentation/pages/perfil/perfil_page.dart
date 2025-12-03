@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/presentation/pages/categoria/categorias_page.dart';
+import 'package:frontend/features/presentation/pages/conta/conta_page.dart';
 import 'package:frontend/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
@@ -84,7 +85,7 @@ class PerfilPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CategoriasPage(),
+                        builder: (context) => const ContaPage(),
                       ),
                     );
                   },

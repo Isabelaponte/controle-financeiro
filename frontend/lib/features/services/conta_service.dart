@@ -97,6 +97,14 @@ class ContaService {
     );
   }
 
+  Future<ContaModel> reativar(String id) async {
+    return _apiClient.patch(
+      '/contas/$id/ativar',
+      {},
+      (json) => ContaModel.fromJson(json),
+    );
+  }
+
   /// Deleta uma conta
   Future<void> deletar(String id) async {
     await _apiClient.delete(ApiConstants.contaPorId(id));
