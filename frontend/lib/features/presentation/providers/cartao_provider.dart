@@ -27,6 +27,8 @@ class CartaoCreditoProvider extends ChangeNotifier {
   List<CartaoCreditoModel> get cartoes => _cartoes;
   List<CartaoCreditoModel> get cartoesAtivos =>
       _cartoes.where((c) => c.ativo).toList();
+  List<CartaoCreditoModel> get cartoesInativos =>
+      _cartoes.where((c) => !c.ativo).toList();
   Map<String, FaturaModel?> get faturasPorCartao => _faturasPorCartao;
   CartaoCreditoStatus get status => _status;
   String? get errorMessage => _errorMessage;
@@ -62,7 +64,29 @@ class CartaoCreditoProvider extends ChangeNotifier {
     try {
       _cartoes = await _cartaoService.listarAtivosPorUsuario(usuarioId);
 
-      // Carrega a fatura atual de cada cartão
+      await _carregarFaturas();
+
+      _status = CartaoCreditoStatus.success;
+    } on ApiException catch (e) {
+      _status = CartaoCreditoStatus.error;
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+    } catch (e) {
+      _status = CartaoCreditoStatus.error;
+      _errorMessage = 'Erro inesperado ao carregar cartões';
+    }
+    notifyListeners();
+  }
+
+  Future<void> carregarTodosCartoes(String usuarioId) async {
+    _status = CartaoCreditoStatus.loading;
+    _errorMessage = null;
+    _isAuthError = false;
+    notifyListeners();
+
+    try {
+      _cartoes = await _cartaoService.listarPorUsuario(usuarioId);
+
       await _carregarFaturas();
 
       _status = CartaoCreditoStatus.success;
@@ -181,6 +205,20 @@ class CartaoCreditoProvider extends ChangeNotifier {
   Future<bool> desativarCartao(String id) async {
     try {
       await _cartaoService.desativar(id);
+      _cartoes.removeWhere((c) => c.id == id);
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isAuthError = e.isAuthError;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> reativarCartao(String id) async {
+    try {
+      await _cartaoService.ativar(id);
       _cartoes.removeWhere((c) => c.id == id);
       notifyListeners();
       return true;

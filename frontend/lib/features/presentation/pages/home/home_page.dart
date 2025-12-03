@@ -3,8 +3,9 @@ import 'package:frontend/features/presentation/pages/home/widgets/app_bar_conten
 import 'package:frontend/features/presentation/pages/home/widgets/resumo_cards.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_cartoes.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_contas.dart';
-import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
+// import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
+import 'package:frontend/features/presentation/providers/resumo_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/presentation/providers/auth_provider.dart';
@@ -17,6 +18,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _carregarDadosIniciais();
+    });
+  }
+
+  Future<void> _carregarDadosIniciais() async {
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.user;
+
+    if (user == null) return;
+
+    final contaProvider = context.read<ContaProvider>();
+    final resumoProvider = context.read<ResumoProvider>();
+
+    await Future.wait([
+      contaProvider.carregarDados(user.id),
+      resumoProvider.carregarResumoMensal(usuarioId: user.id),
+    ]);
+  }
+
   Future<void> _atualizarDados() async {
     final authProvider = context.read<AuthProvider>();
     final user = authProvider.user;
@@ -24,7 +48,12 @@ class _HomePageState extends State<HomePage> {
     if (user == null) return;
 
     final contaProvider = context.read<ContaProvider>();
-    await contaProvider.carregarDados(user.id);
+    final resumoProvider = context.read<ResumoProvider>();
+
+    await Future.wait([
+      contaProvider.carregarDados(user.id),
+      resumoProvider.atualizarResumo(usuarioId: user.id),
+    ]);
   }
 
   @override
@@ -48,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 10),
                 SecaoCartoes(),
                 SizedBox(height: 10),
-                SecaoMetas(),
+                // SecaoMetas(),
               ],
             ),
           ),

@@ -1,31 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/app_colors.dart';
+import 'package:frontend/features/presentation/providers/resumo_provider.dart';
+import 'package:provider/provider.dart';
 
 class ResumoCards extends StatelessWidget {
   const ResumoCards({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ResumoCard(
-            valor: "654,54",
-            label: "Ganhos",
-            icon: Icons.trending_up,
-            color: AppColors.green,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: ResumoCard(
-            valor: "654,54",
-            label: "Gastos",
-            icon: Icons.trending_down,
-            color: AppColors.red,
-          ),
-        ),
-      ],
+    return Consumer<ResumoProvider>(
+      builder: (context, resumoProvider, child) {
+        if (resumoProvider.isLoading) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (resumoProvider.status == ResumoStatus.error) {
+          return Center(
+            child: Text(
+              resumoProvider.errorMessage ?? 'Erro ao carregar resumo',
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(
+              child: ResumoCard(
+                valor: resumoProvider.totalGanhosFormatado.replaceAll(
+                  'R\$ ',
+                  '',
+                ),
+                label: "Ganhos",
+                icon: Icons.trending_up,
+                color: AppColors.green,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ResumoCard(
+                valor: resumoProvider.totalGastosFormatado.replaceAll(
+                  'R\$ ',
+                  '',
+                ),
+                label: "Gastos",
+                icon: Icons.trending_down,
+                color: AppColors.red,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

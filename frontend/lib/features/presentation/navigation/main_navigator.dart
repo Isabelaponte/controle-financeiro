@@ -9,7 +9,7 @@ import 'package:frontend/features/presentation/pages/receitas/receita_form_page.
 import 'package:frontend/features/presentation/pages/transacoes/transacoes_page.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
-import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
+// import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
 import 'package:frontend/features/presentation/providers/auth_provider.dart';
@@ -51,19 +51,20 @@ class _MainNavigatorState extends State<MainNavigator> {
 
     final contaProvider = context.read<ContaProvider>();
     final cartaoProvider = context.read<CartaoCreditoProvider>();
-    final metaProvider = context.read<MetaFinanceiraProvider>();
+    // final metaProvider = context.read<MetaFinanceiraProvider>();
 
     try {
       await Future.wait([
         contaProvider.carregarDados(user.id),
         cartaoProvider.carregarCartoes(user.id),
-        metaProvider.carregarMetas(user.id),
+        // metaProvider.carregarMetas(user.id),
       ]);
 
       // Verifica se houve erro de autenticação
       if (contaProvider.isAuthError ||
-          cartaoProvider.isAuthError ||
-          metaProvider.isAuthError) {
+          cartaoProvider.isAuthError
+          // || metaProvider.isAuthError
+          ) {
         _handleAuthError();
       }
     } catch (e) {

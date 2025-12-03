@@ -101,6 +101,14 @@ class CartaoCreditoService {
     );
   }
 
+  Future<CartaoCreditoModel> ativar(String id) async {
+    return _apiClient.patch(
+      ApiConstants.ativarCartaoCredito(id),
+      {},
+      (json) => CartaoCreditoModel.fromJson(json),
+    );
+  }
+
   /// Deleta um cartão
   Future<void> deletar(String id) async {
     await _apiClient.delete(ApiConstants.cartaoCreditoPorId(id));

@@ -30,6 +30,7 @@ class ApiConstants {
       '/cartoes-credito/$id/alterar-limite';
   static String desativarCartaoCredito(String id) =>
       '/cartoes-credito/$id/desativar';
+  static String ativarCartaoCredito(String id) => '/cartoes-credito/$id/ativar';
 
   // Endpoints de Metas Financeiras
   static const String metasFinanceiras = '/metas-financeiras';
@@ -101,6 +102,10 @@ class ApiConstants {
   static String despesasCartaoPorFatura(String faturaId) =>
       '/despesas-cartao/fatura/$faturaId';
   static String atualizarDespesaCartao(String id) => 'despesas-cartao/$id';
+
+  // Endpoints de Resumo
+  static String resumoMensal(String usuarioId) =>
+      '/resumo/$usuarioId/mensal';
 
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',

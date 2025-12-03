@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
-import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
+// import 'package:frontend/features/presentation/providers/meta_financeira_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/app_colors.dart';
 
@@ -12,7 +12,7 @@ class EstatisticasPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final contaProvider = context.watch<ContaProvider>();
     final cartaoProvider = context.watch<CartaoCreditoProvider>();
-    final metaProvider = context.watch<MetaFinanceiraProvider>();
+    // final metaProvider = context.watch<MetaFinanceiraProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -54,15 +54,15 @@ class EstatisticasPage extends StatelessWidget {
             const SizedBox(height: 12),
 
             // Card de Metas
-            if (metaProvider.resumo != null)
-              _buildStatCard(
-                titulo: 'Total em Metas',
-                valor: metaProvider.resumo!.totalAcumuladoFormatado,
-                subtitulo:
-                    '${metaProvider.resumo!.percentualFormatado} alcançado',
-                icon: Icons.flag,
-                cor: AppColors.green,
-              ),
+            // if (metaProvider.resumo != null)
+            //   _buildStatCard(
+            //     titulo: 'Total em Metas',
+            //     valor: metaProvider.resumo!.totalAcumuladoFormatado,
+            //     subtitulo:
+            //         '${metaProvider.resumo!.percentualFormatado} alcançado',
+            //     icon: Icons.flag,
+            //     cor: AppColors.green,
+            //   ),
 
             const SizedBox(height: 32),
 
@@ -86,16 +86,16 @@ class EstatisticasPage extends StatelessWidget {
               '${cartaoProvider.cartoes.length}',
               Icons.credit_card,
             ),
-            _buildInfoTile(
-              'Metas em Andamento',
-              '${metaProvider.metasEmAndamento.length}',
-              Icons.flag,
-            ),
-            _buildInfoTile(
-              'Metas Concluídas',
-              '${metaProvider.metasConcluidas.length}',
-              Icons.check_circle,
-            ),
+            // _buildInfoTile(
+            //   'Metas em Andamento',
+            //   '${metaProvider.metasEmAndamento.length}',
+            //   Icons.flag,
+            // ),
+            // _buildInfoTile(
+            //   'Metas Concluídas',
+            //   '${metaProvider.metasConcluidas.length}',
+            //   Icons.check_circle,
+            // ),
           ],
         ),
       ),

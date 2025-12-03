@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/presentation/pages/cartao/cartao_page.dart';
 import 'package:frontend/features/presentation/pages/categoria/categorias_page.dart';
 import 'package:frontend/features/presentation/pages/conta/conta_page.dart';
 import 'package:frontend/routes/app_routes.dart';
@@ -72,7 +73,7 @@ class PerfilPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CategoriasPage(),
+                        builder: (context) => const CartaoCreditoPage(),
                       ),
                     );
                   },
@@ -90,19 +91,19 @@ class PerfilPage extends StatelessWidget {
                     );
                   },
                 ),
-                const Divider(height: 1),
-                _buildMenuOption(
-                  icon: Icons.flag,
-                  titulo: 'Minhas Metas',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CategoriasPage(),
-                      ),
-                    );
-                  },
-                ),
+                // const Divider(height: 1),
+                // _buildMenuOption(
+                //   icon: Icons.flag,
+                //   titulo: 'Minhas Metas',
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const CategoriasPage(),
+                //       ),
+                //     );
+                //   },
+                // ),
                 const Divider(height: 1),
                 _buildMenuOption(
                   icon: Icons.category,
