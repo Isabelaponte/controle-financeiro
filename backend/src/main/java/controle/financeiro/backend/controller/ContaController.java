@@ -82,6 +82,12 @@ public class ContaController {
         return ResponseEntity.ok(desativada);
     }
 
+    @PatchMapping("/{id}/ativar")
+    public ResponseEntity<ContaResponseDTO> ativar(@PathVariable String id) {
+        ContaResponseDTO ativada = contaService.ativar(id);
+        return ResponseEntity.ok(ativada);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable String id) {
         contaService.deletar(id);

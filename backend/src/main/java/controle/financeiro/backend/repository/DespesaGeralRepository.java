@@ -20,4 +20,10 @@ public interface DespesaGeralRepository extends JpaRepository<DespesaGeral, Stri
     List<DespesaGeral> findByUsuarioIdAndDataDespesaBetween(String usuarioId, LocalDate inicio, LocalDate fim);
 
     List<DespesaGeral> findByCategoriaId(String categoriaId);
+
+    List<DespesaGeral> findByUsuarioIdAndDataVencimentoBetween(
+            String usuarioId,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
 }

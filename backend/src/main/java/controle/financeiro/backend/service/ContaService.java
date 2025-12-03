@@ -147,6 +147,16 @@ public class ContaService {
         return contaMapper.toResponseDTO(desativada);
     }
 
+    public ContaResponseDTO ativar(String id) {
+        Conta conta = contaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEcontradoException("Conta não encontrada"));
+
+        conta.setAtiva(true);
+        Conta desativada = contaRepository.save(conta);
+
+        return contaMapper.toResponseDTO(desativada);
+    }
+
     public void deletar(String id) {
         if (!contaRepository.existsById(id)) {
             throw new RecursoNaoEcontradoException("Conta não encontrada");

@@ -67,6 +67,12 @@ public class CartaoCreditoController {
         return ResponseEntity.ok(desativado);
     }
 
+    @PatchMapping("/{id}/ativar")
+    public ResponseEntity<CartaoCreditoResponseDTO> ativar(@PathVariable String id) {
+        CartaoCreditoResponseDTO ativado = cartaoService.desativar(id);
+        return ResponseEntity.ok(ativado);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable String id) {
         cartaoService.deletar(id);

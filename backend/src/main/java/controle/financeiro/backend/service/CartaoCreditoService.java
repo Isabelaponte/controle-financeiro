@@ -157,6 +157,16 @@ public class CartaoCreditoService {
         return cartaoMapper.toResponseDTO(desativado);
     }
 
+    public CartaoCreditoResponseDTO ativar(String id) {
+        CartaoCredito cartao = cartaoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEcontradoException("Cartão de crédito não encontrado"));
+
+        cartao.setAtivo(true);
+        CartaoCredito ativado = cartaoRepository.save(cartao);
+
+        return cartaoMapper.toResponseDTO(ativado);
+    }
+
     public void deletar(String id) {
         if (!cartaoRepository.existsById(id)) {
             throw new RecursoNaoEcontradoException("Cartão de crédito não encontrado");
