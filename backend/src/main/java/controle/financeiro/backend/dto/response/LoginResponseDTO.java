@@ -2,7 +2,7 @@ package controle.financeiro.backend.dto.response;
 
 public record LoginResponseDTO(
         String id,
-        String name,
+        String nomeUsuario,
         String email,
         String token
 ) {}
