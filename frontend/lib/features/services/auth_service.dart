@@ -88,7 +88,11 @@ class AuthService {
       final response = await http.post(
         Uri.parse('${ApiConstants.baseUrl}${ApiConstants.registerEndpoint}'),
         headers: ApiConstants.headers,
-        body: jsonEncode({'username': name, 'email': email, 'senha': password}),
+        body: jsonEncode({
+          'nomeUsuario': name,
+          'email': email,
+          'senha': password,
+        }),
       );
 
       final data = jsonDecode(response.body);
@@ -107,6 +111,126 @@ class AuthService {
         return {
           'success': false,
           'message': data['message'] ?? 'Erro ao fazer cadastro',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erro de conexão: ${e.toString()}'};
+    }
+  }
+
+  /// Busca usuário por ID
+  Future<Map<String, dynamic>> buscarUsuarioPorId(String id) async {
+    try {
+      final token = await getToken();
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/usuarios/$id'),
+        headers: {...ApiConstants.headers, 'Authorization': 'Bearer $token'},
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        final user = UserModel.fromJson(data);
+        return {'success': true, 'user': user};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Erro ao buscar usuário',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erro de conexão: ${e.toString()}'};
+    }
+  }
+
+  /// Atualiza dados do usuário
+  Future<Map<String, dynamic>> atualizarUsuario({
+    required String id,
+    String? nomeUsuario,
+    String? email,
+  }) async {
+    try {
+      final token = await getToken();
+
+      final body = <String, dynamic>{};
+      if (nomeUsuario != null) body['nomeUsuario'] = nomeUsuario;
+      if (email != null) body['email'] = email;
+
+      final response = await http.put(
+        Uri.parse('${ApiConstants.baseUrl}/usuarios/$id'),
+        headers: {...ApiConstants.headers, 'Authorization': 'Bearer $token'},
+        body: jsonEncode(body),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        final user = UserModel.fromJson(data);
+        await _saveUser(user);
+        return {'success': true, 'user': user};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Erro ao atualizar usuário',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erro de conexão: ${e.toString()}'};
+    }
+  }
+
+  /// Altera senha do usuário
+  Future<Map<String, dynamic>> alterarSenha({
+    required String id,
+    required String senhaAtual,
+    required String novaSenha,
+    required String confirmarNovaSenha, // ✅ Adicionado
+  }) async {
+    try {
+      final token = await getToken();
+
+      final response = await http.put(
+        Uri.parse('${ApiConstants.baseUrl}/usuarios/$id/senha'),
+        headers: {...ApiConstants.headers, 'Authorization': 'Bearer $token'},
+        body: jsonEncode({
+          'senhaAtual': senhaAtual,
+          'novaSenha': novaSenha,
+          'confirmarNovaSenha': confirmarNovaSenha, // ✅ Adicionado
+        }),
+      );
+
+      if (response.statusCode == 204) {
+        return {'success': true};
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Erro ao alterar senha',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erro de conexão: ${e.toString()}'};
+    }
+  }
+
+  /// Deleta usuário
+  Future<Map<String, dynamic>> deletarUsuario(String id) async {
+    try {
+      final token = await getToken();
+
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}/usuarios/$id'),
+        headers: {...ApiConstants.headers, 'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 204) {
+        await clearAuth();
+        return {'success': true};
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Erro ao deletar usuário',
         };
       }
     } catch (e) {

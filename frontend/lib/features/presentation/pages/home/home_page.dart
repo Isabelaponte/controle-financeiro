@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
     final user = authProvider.user;
 
     return Scaffold(
-      appBar: _buildAppBar(user?.name ?? 'Usuário'),
+      appBar: _buildAppBar(user?.nomeUsuario ?? 'Usuário'),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _atualizarDados,

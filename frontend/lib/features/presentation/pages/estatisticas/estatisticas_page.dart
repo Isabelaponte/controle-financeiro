@@ -16,7 +16,7 @@ class EstatisticasPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Estatísticas'),
+        title: const Text('Estatísticas', style: TextStyle(fontSize: 16),),
         backgroundColor: AppColors.purpleLight,
         foregroundColor: AppColors.purpleDark,
       ),
