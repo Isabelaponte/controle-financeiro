@@ -47,12 +47,12 @@ public class AuthController {
             throw new EmailJaExisteException("Email já cadastrado");
         }
 
-        if (body.username() == null || body.username().trim().isEmpty()) {
+        if (body.nomeUsuario() == null || body.nomeUsuario().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome de usuário não pode ser vazio");
         }
 
         Usuario novoUsuario = new Usuario();
-        novoUsuario.setNomeUsuario(body.username().trim());
+        novoUsuario.setNomeUsuario(body.nomeUsuario().trim());
         novoUsuario.setEmail(body.email().toLowerCase().trim());
         novoUsuario.setSenha(passwordEncoder.encode(body.senha()));
 

@@ -87,19 +87,19 @@ class _CartaoFormPageState extends State<CartaoFormPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
 
-              // Ícone (opcional)
-              TextFormField(
-                controller: _iconeController,
-                decoration: InputDecoration(
-                  labelText: 'Ícone',
-                  labelStyle: TextStyle(color: AppColors.purpleDark),
-                  hintText: 'Ex: credit_card',
-                  border: OutlineInputBorder(),
-                ),
-                maxLength: 50,
-              ),
+              // // Ícone (opcional)
+              // TextFormField(
+              //   controller: _iconeController,
+              //   decoration: InputDecoration(
+              //     labelText: 'Ícone',
+              //     labelStyle: TextStyle(color: AppColors.purpleDark),
+              //     hintText: 'Ex: credit_card',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   maxLength: 50,
+              // ),
               const SizedBox(height: 20),
 
               // Limite Total
