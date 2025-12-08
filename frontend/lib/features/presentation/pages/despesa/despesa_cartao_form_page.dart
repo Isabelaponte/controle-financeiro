@@ -40,21 +40,31 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
   @override
   void initState() {
     super.initState();
-    _carregarDados();
+    // _carregarDados();
     if (isEdicao) {
       _preencherCampos();
     }
+
+    Future(() {
+      final authProvider = context.read<AuthProvider>();
+      final user = authProvider.user;
+
+      if (user != null) {
+        context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
+        context.read<CartaoCreditoProvider>().carregarCartoes(user.id);
+      }
+    });
   }
 
-  Future<void> _carregarDados() async {
-    final authProvider = context.read<AuthProvider>();
-    final user = authProvider.user;
+  // Future<void> _carregarDados() async {
+  //   final authProvider = context.read<AuthProvider>();
+  //   final user = authProvider.user;
 
-    if (user != null) {
-      context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
-      context.read<CartaoCreditoProvider>().carregarCartoes(user.id);
-    }
-  }
+  //   if (user != null) {
+  //     context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
+  //     context.read<CartaoCreditoProvider>().carregarCartoes(user.id);
+  //   }
+  // }
 
   void _preencherCampos() {
     final despesa = widget.despesa!;
@@ -137,8 +147,7 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\,?\d{0,2}')),
                 ],
-                onChanged: (_) =>
-                    setState(() {}),
+                onChanged: (_) => setState(() {}),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Valor é obrigatório';
@@ -283,7 +292,7 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
                   return DropdownButtonFormField<String>(
                     value: _categoriaId,
                     decoration: InputDecoration(
-                      labelText: 'Categoria *',
+                      labelText: 'Categoria (Opcional)',
                       labelStyle: TextStyle(color: AppColors.purpleDark),
                       border: const OutlineInputBorder(),
                     ),
@@ -315,10 +324,6 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
                       );
                     }).toList(),
                     onChanged: (value) => setState(() => _categoriaId = value),
-                    validator: (value) {
-                      if (value == null) return 'Selecione uma categoria';
-                      return null;
-                    },
                   );
                 },
               ),
@@ -479,11 +484,6 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
       return;
     }
 
-    if (_categoriaId == null) {
-      _mostrarErro('Selecione uma categoria');
-      return;
-    }
-
     if (_parcelado && _numeroParcelas < 2) {
       _mostrarErro('Número de parcelas deve ser maior que 1');
       return;
@@ -506,7 +506,7 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
       if (isEdicao) {
         sucesso = await transacaoProvider.atualizarDespesaCartao(
           widget.despesa!.id,
-          categoriaId: _categoriaId!,
+          categoriaId: _categoriaId,
           cartaoId: _cartaoId!,
           descricao: _descricaoController.text.trim(),
           valor: double.parse(_valorController.text.replaceAll(',', '.')),
@@ -519,7 +519,7 @@ class _DespesaCartaoFormPageState extends State<DespesaCartaoFormPage> {
       } else {
         sucesso = await transacaoProvider.criarDespesaCartao(
           usuarioId: user.id,
-          categoriaId: _categoriaId!,
+          categoriaId: _categoriaId,
           cartaoId: _cartaoId!,
           descricao: _descricaoController.text.trim(),
           valor: double.parse(_valorController.text.replaceAll(',', '.')),

@@ -217,13 +217,13 @@ class TransacaoProvider extends ChangeNotifier {
 
   Future<bool> criarDespesaGeral({
     required String usuarioId,
-    required String categoriaId,
     required String descricao,
     required double valor,
     required DateTime dataVencimento,
     String? contaId,
     String? formaPagamento,
     DateTime? lembrete,
+    String? categoriaId,
     bool? pago,
     bool? repetir,
     int? periodo,
@@ -301,10 +301,10 @@ class TransacaoProvider extends ChangeNotifier {
 
   Future<bool> criarDespesaCartao({
     required String usuarioId,
-    required String categoriaId,
     required String cartaoId,
     required String descricao,
     required double valor,
+    String? categoriaId,
     String? faturaId,
     DateTime? lembrete,
     bool? fixa,

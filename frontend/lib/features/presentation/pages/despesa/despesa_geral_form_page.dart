@@ -39,21 +39,30 @@ class _DespesaGeralFormPageState extends State<DespesaGeralFormPage> {
   @override
   void initState() {
     super.initState();
-    _carregarDados();
     if (isEdicao) {
       _preencherCampos();
     }
+
+    Future(() {
+      final authProvider = context.read<AuthProvider>();
+      final user = authProvider.user;
+
+      if (user != null) {
+        context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
+        context.read<ContaProvider>().carregarContas(user.id);
+      }
+    });
   }
 
-  Future<void> _carregarDados() async {
-    final authProvider = context.read<AuthProvider>();
-    final user = authProvider.user;
+  // Future<void> _carregarDados() async {
+  //   final authProvider = context.read<AuthProvider>();
+  //   final user = authProvider.user;
 
-    if (user != null) {
-      context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
-      context.read<ContaProvider>().carregarContas(user.id);
-    }
-  }
+  //   if (user != null) {
+  //     context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
+  //     context.read<ContaProvider>().carregarContas(user.id);
+  //   }
+  // }
 
   void _preencherCampos() {
     final despesa = widget.despesa!;
@@ -466,7 +475,7 @@ class _DespesaGeralFormPageState extends State<DespesaGeralFormPage> {
       } else {
         sucesso = await transacaoProvider.criarDespesaGeral(
           usuarioId: user.id,
-          categoriaId: _categoriaId!,
+          categoriaId: _categoriaId,
           descricao: _descricaoController.text.trim(),
           valor: double.parse(_valorController.text.replaceAll(',', '.')),
           dataVencimento: _dataVencimento,
