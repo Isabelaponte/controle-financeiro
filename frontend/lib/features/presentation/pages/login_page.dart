@@ -117,16 +117,16 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Implementar recuperação de senha
-                      },
-                      child: const Text('Esqueceu a senha?'),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: TextButton(
+                  //     onPressed: () {
+                  //       // Implementar recuperação de senha
+                  //     },
+                  //     child: const Text('Esqueceu a senha?'),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 24),
 
                   SizedBox(
                     height: 50,

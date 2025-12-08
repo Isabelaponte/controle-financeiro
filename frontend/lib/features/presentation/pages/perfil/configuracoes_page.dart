@@ -158,7 +158,9 @@ class ConfiguracoesPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmar exclusão'),
-        content: const Text('Deseja realmente excluir sua conta?'),
+        content: const Text(
+          'Deseja realmente excluir sua conta? Esta ação não pode ser desfeita.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -174,9 +176,26 @@ class ConfiguracoesPage extends StatelessWidget {
     );
 
     if (confirm == true && context.mounted) {
-      await authProvider.deletarConta();
-      if (context.mounted) {
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      try {
+        await authProvider.deletarConta();
+        await authProvider.logout();
+
+        if (context.mounted) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.login,
+            (route) => false,
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao excluir conta: $e'),
+              backgroundColor: AppColors.red,
+            ),
+          );
+        }
       }
     }
   }

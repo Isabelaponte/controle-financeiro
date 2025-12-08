@@ -116,7 +116,7 @@ class IconPicker extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
+            crossAxisCount: 4,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 1,

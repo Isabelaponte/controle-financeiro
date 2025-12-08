@@ -37,8 +37,11 @@ public class DespesaGeralService {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Usuário não encontrado"));
 
-        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new RecursoNaoEcontradoException("Categoria não encontrada"));
+        Categoria categoria = null;
+        if (dto.getCategoriaId() != null) {
+            categoria = categoriaRepository.findById(dto.getCategoriaId())
+                    .orElseThrow(() -> new RecursoNaoEcontradoException("Categoria não encontrada"));
+        }
 
         Conta conta = null;
         if (dto.getContaId() != null) {

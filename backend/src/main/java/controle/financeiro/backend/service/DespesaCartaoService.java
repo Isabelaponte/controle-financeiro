@@ -32,8 +32,11 @@ public class DespesaCartaoService {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Usuário não encontrado"));
 
-        Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new RecursoNaoEcontradoException("Categoria não encontrada"));
+        Categoria categoria = null;
+        if (dto.getCategoriaId() != null) {
+            categoria = categoriaRepository.findById(dto.getCategoriaId())
+                    .orElseThrow(() -> new RecursoNaoEcontradoException("Categoria não encontrada"));
+        }
 
         CartaoCredito cartao = cartaoCreditoRepository.findById(dto.getCartaoId())
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Cartão de crédito não encontrado"));

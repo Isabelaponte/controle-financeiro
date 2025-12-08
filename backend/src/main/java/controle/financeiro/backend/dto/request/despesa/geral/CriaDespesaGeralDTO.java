@@ -29,7 +29,6 @@ public class CriaDespesaGeralDTO {
     @NotNull(message = "ID do usuário é obrigatório")
     private String usuarioId;
 
-    @NotNull(message = "ID da categoria é obrigatório")
     private String categoriaId;
 
     private String contaId;

@@ -3,6 +3,7 @@ import 'package:frontend/features/presentation/pages/home/widgets/app_bar_conten
 import 'package:frontend/features/presentation/pages/home/widgets/resumo_cards.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_cartoes.dart';
 import 'package:frontend/features/presentation/pages/home/widgets/secao_contas.dart';
+import 'package:frontend/features/presentation/providers/cartao_provider.dart';
 // import 'package:frontend/features/presentation/pages/home/widgets/secao_metas.dart';
 import 'package:frontend/features/presentation/providers/conta_provider.dart';
 import 'package:frontend/features/presentation/providers/resumo_provider.dart';
@@ -34,10 +35,12 @@ class _HomePageState extends State<HomePage> {
 
     final contaProvider = context.read<ContaProvider>();
     final resumoProvider = context.read<ResumoProvider>();
+    final cartaoProvider = context.read<CartaoCreditoProvider>();
 
     await Future.wait([
       contaProvider.carregarDados(user.id),
       resumoProvider.carregarResumoMensal(usuarioId: user.id),
+      cartaoProvider.carregarCartoes(user.id)
     ]);
   }
 
@@ -49,10 +52,12 @@ class _HomePageState extends State<HomePage> {
 
     final contaProvider = context.read<ContaProvider>();
     final resumoProvider = context.read<ResumoProvider>();
+    final cartaoProvider = context.read<CartaoCreditoProvider>();
 
     await Future.wait([
       contaProvider.carregarDados(user.id),
       resumoProvider.atualizarResumo(usuarioId: user.id),
+      cartaoProvider.carregarCartoes(user.id)
     ]);
   }
 

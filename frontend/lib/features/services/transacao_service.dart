@@ -138,12 +138,12 @@ class TransacaoService {
 
   Future<TransacaoModel> criarDespesaGeral({
     required String usuarioId,
-    required String categoriaId,
     required String descricao,
     required double valor,
     required DateTime dataVencimento,
     String? contaId,
     String? formaPagamento,
+    String? categoriaId,
     DateTime? lembrete,
     bool? pago,
     bool? repetir,
@@ -219,10 +219,10 @@ class TransacaoService {
   Future<TransacaoModel> criarDespesaCartao({
     required String usuarioId,
     required String cartaoId,
-    required String categoriaId,
     required String descricao,
     required double valor,
     String? faturaId,
+    String? categoriaId,
     DateTime? lembrete,
     bool? fixa,
     int? quantidadeParcelas,

@@ -10,6 +10,8 @@ import controle.financeiro.backend.exception.usuario.SenhaInvalidaException;
 import controle.financeiro.backend.mapper.UsuarioMapper;
 import controle.financeiro.backend.model.Usuario;
 import controle.financeiro.backend.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,9 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
         this.usuarioRepository = usuarioRepository;
@@ -70,7 +75,7 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Usuario com ID " + id + " não encontrado"));
 
-        if (!dto.getSenhaAtual().equals(usuario.getSenha())) {
+        if (!passwordEncoder.matches(dto.getSenhaAtual(), usuario.getSenha())) {
             throw new SenhaInvalidaException("Senha atual incorreta");
         }
 
@@ -78,7 +83,7 @@ public class UsuarioService {
             throw new IllegalArgumentException("As senhas não coincidem");
         }
 
-        usuario.setSenha(dto.getNovaSenha());
+        usuario.setSenha(passwordEncoder.encode(dto.getNovaSenha()));
 
         usuarioRepository.save(usuario);
     }
@@ -88,5 +93,13 @@ public class UsuarioService {
             throw new RecursoNaoEcontradoException("Usuario com ID " + id + " não encontrado");
         }
         usuarioRepository.deleteById(id);
+    }
+
+    public void desativarConta(String usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        usuario.setAtivo(false);
+        usuarioRepository.save(usuario);
     }
 }

@@ -39,21 +39,30 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
   @override
   void initState() {
     super.initState();
-    _carregarDados();
+    // _carregarDados();
     if (isEdicao) {
       _preencherCampos();
     }
+
+    Future(() {
+      final authProvider = context.read<AuthProvider>();
+      final user = authProvider.user;
+
+      if (user != null) {
+        context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
+        context.read<ContaProvider>().carregarContas(user.id);
+      }
+    });
   }
 
-  Future<void> _carregarDados() async {
-    final authProvider = context.read<AuthProvider>();
-    final user = authProvider.user;
+  // Future<void> _carregarDados() async {
+  //   final authProvider = context.read<AuthProvider>();
+  //   final user = authProvider.user;
 
-    if (user != null) {
-      context.read<CategoriaProvider>().carregarCategoriasAtivas(user.id);
-      context.read<ContaProvider>().carregarContas(user.id);
-    }
-  }
+  //   if (user != null) {
+
+  //   }
+  // }
 
   void _preencherCampos() {
     final receita = widget.receita!;
@@ -193,8 +202,22 @@ class _ReceitaFormPageState extends State<ReceitaFormPage> {
 
                   final contas = contaProvider.contasAtivas;
 
+                  // Verifica se o _contaId existe na lista de contas
+                  final contaExiste = contas.any(
+                    (conta) => conta.id == _contaId,
+                  );
+
+                  // Se não existir, limpa o _contaId
+                  if (_contaId != null && !contaExiste) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() => _contaId = null);
+                    });
+                  }
+
                   return DropdownButtonFormField<String>(
-                    initialValue: _contaId,
+                    value: contaExiste
+                        ? _contaId
+                        : null, // Usa value ao invés de initialValue
                     decoration: InputDecoration(
                       labelText: 'Conta *',
                       labelStyle: TextStyle(color: AppColors.purpleDark),

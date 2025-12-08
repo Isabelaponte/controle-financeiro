@@ -184,7 +184,7 @@ class AuthService {
     required String id,
     required String senhaAtual,
     required String novaSenha,
-    required String confirmarNovaSenha, // ✅ Adicionado
+    required String confirmarNovaSenha,
   }) async {
     try {
       final token = await getToken();
@@ -195,7 +195,7 @@ class AuthService {
         body: jsonEncode({
           'senhaAtual': senhaAtual,
           'novaSenha': novaSenha,
-          'confirmarNovaSenha': confirmarNovaSenha, // ✅ Adicionado
+          'confirmarNovaSenha': confirmarNovaSenha,
         }),
       );
 
