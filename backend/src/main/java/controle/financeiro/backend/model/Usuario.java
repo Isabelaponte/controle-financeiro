@@ -27,6 +27,9 @@ public class Usuario {
 
     @Column(name = "nome_usuario", nullable = false)
     private String nomeUsuario;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }
 
 

@@ -139,20 +139,21 @@ public class ReceitaService {
         Receita receita = receitaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Receita não encontrada"));
 
-        Conta conta = null;
-        if (dto.getContaId() != null) {
-            conta = contaRepository.findById(dto.getContaId())
-                    .orElseThrow(() -> new RecursoNaoEcontradoException("Conta não encontrada"));
+        Conta conta = contaRepository.findById(dto.getContaId())
+                .orElseThrow(() -> new RecursoNaoEcontradoException("Conta não encontrada"));;
 
-            if (!conta.getUsuario().getId().equals(receita.getUsuario().getId())) {
-                throw new IllegalArgumentException("Conta não pertence ao usuário");
-            }
+        if (!conta.getUsuario().getId().equals(receita.getUsuario().getId())) {
+           throw new IllegalArgumentException("Conta não pertence ao usuário");
         }
 
         Categoria categoria = null;
         if (dto.getCategoriaId() != null) {
             categoria = categoriaRepository.findById(dto.getCategoriaId())
                     .orElseThrow(() -> new RecursoNaoEcontradoException("Categoria não encontrada"));
+        }
+
+        if (receita.getRecebida() == true) {
+            contaService.adicionarSaldo(conta.getId(), receita.getValor());
         }
 
         receitaMapper.updateEntity(dto, receita, conta, categoria);

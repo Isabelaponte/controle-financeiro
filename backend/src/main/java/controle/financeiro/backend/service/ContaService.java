@@ -127,10 +127,6 @@ public class ContaService {
         Conta conta = contaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEcontradoException("Conta não encontrada"));
 
-        if (conta.getSaldo() < valor) {
-            throw new SaldoInsuficienteException("Saldo insuficiente na conta");
-        }
-
         conta.setSaldo(conta.getSaldo() - valor);
         Conta atualizada = contaRepository.save(conta);
 
